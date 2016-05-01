@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		1615C8831CD5549E0094B1AC /* OrbitalElements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1615C8821CD5549E0094B1AC /* OrbitalElements.swift */; };
+		1615C8851CD5864B0094B1AC /* Transfer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1615C8841CD5864B0094B1AC /* Transfer.swift */; };
+		1615C8871CD5C4C80094B1AC /* TransferTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1615C8861CD5C4C80094B1AC /* TransferTests.swift */; };
 		162394971CD430DD003304D9 /* KerbalMechanics.h in Headers */ = {isa = PBXBuildFile; fileRef = 162394961CD430DD003304D9 /* KerbalMechanics.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1623949E1CD430DD003304D9 /* KerbalMechanics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 162394931CD430DD003304D9 /* KerbalMechanics.framework */; };
 		162395411CD45180003304D9 /* Vector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162395401CD45180003304D9 /* Vector.swift */; };
@@ -29,6 +31,8 @@
 
 /* Begin PBXFileReference section */
 		1615C8821CD5549E0094B1AC /* OrbitalElements.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OrbitalElements.swift; sourceTree = "<group>"; };
+		1615C8841CD5864B0094B1AC /* Transfer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Transfer.swift; sourceTree = "<group>"; };
+		1615C8861CD5C4C80094B1AC /* TransferTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransferTests.swift; sourceTree = "<group>"; };
 		162394931CD430DD003304D9 /* KerbalMechanics.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = KerbalMechanics.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		162394961CD430DD003304D9 /* KerbalMechanics.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KerbalMechanics.h; sourceTree = "<group>"; };
 		162394981CD430DD003304D9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -95,6 +99,7 @@
 			children = (
 				162394A41CD430DD003304D9 /* Info.plist */,
 				1623954C1CD480AE003304D9 /* OrbitTests.swift */,
+				1615C8861CD5C4C80094B1AC /* TransferTests.swift */,
 				162395421CD4518D003304D9 /* VectorTests.swift */,
 			);
 			path = KerbalMechanicsTests;
@@ -120,6 +125,7 @@
 			children = (
 				162395441CD4788B003304D9 /* Orbit.swift */,
 				1615C8821CD5549E0094B1AC /* OrbitalElements.swift */,
+				1615C8841CD5864B0094B1AC /* Transfer.swift */,
 				162395401CD45180003304D9 /* Vector.swift */,
 			);
 			name = Models;
@@ -234,6 +240,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				162395451CD4788C003304D9 /* Orbit.swift in Sources */,
+				1615C8851CD5864B0094B1AC /* Transfer.swift in Sources */,
 				162395471CD47B44003304D9 /* DoubleExtensions.swift in Sources */,
 				1615C8831CD5549E0094B1AC /* OrbitalElements.swift in Sources */,
 				162395411CD45180003304D9 /* Vector.swift in Sources */,
@@ -246,6 +253,7 @@
 			files = (
 				1623954D1CD480AE003304D9 /* OrbitTests.swift in Sources */,
 				162395431CD4518D003304D9 /* VectorTests.swift in Sources */,
+				1615C8871CD5C4C80094B1AC /* TransferTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

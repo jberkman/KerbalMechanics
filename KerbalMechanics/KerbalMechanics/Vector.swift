@@ -66,6 +66,11 @@ public struct Vector {
     }
 
     @warn_unused_result
+    public func theta(vector: Vector) -> Double {
+        return acos(self ** vector / magnitude / vector.magnitude)
+    }
+
+    @warn_unused_result
     public func cross(vector: Vector) -> Vector {
         return Vector(a: b * vector.c - c * vector.b, b: c * vector.a - a * vector.c, c: a * vector.b - b * vector.a)
     }
@@ -75,6 +80,10 @@ public struct Vector {
 extension Vector: Equatable { }
 
 public extension Vector {
+
+    public static let xAxis = Vector(x: 1, y: 0, z: 0)
+    public static let yAxis = Vector(x: 0, y: 1, z: 0)
+    public static let zAxis = Vector(x: 0, y: 0, z: 1)
 
     public var x: Double { return a }
     public var y: Double { return b }

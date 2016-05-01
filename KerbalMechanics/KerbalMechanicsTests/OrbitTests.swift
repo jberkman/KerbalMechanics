@@ -33,6 +33,8 @@ import XCTest
 @testable import KerbalMechanics
 
 private let µ = 3.986005e14
+private let µSun = 1.327124e20
+private let AU = 149.597870e9
 
 class OrbitTests: XCTestCase {
 
