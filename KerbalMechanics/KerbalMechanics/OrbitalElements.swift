@@ -56,13 +56,13 @@ public struct OrbitalElements {
          - argumentOfPeriapsis: w (degrees)
          - longitudeOfAscendingNode: W (degrees)
      */
-    public init(meanLongitude: [Double], semiMajorAxis: Double, eccentricity: [Double], inclination: [Double], argumentOfPeriapsis: [Double], longitudeOfAscendingNode: [Double]) {
-        self.meanLongitude = meanLongitude
-        self.semiMajorAxis = semiMajorAxis
-        self.eccentricity = eccentricity
-        self.inclination = inclination
-        self.argumentOfPeriapsis = argumentOfPeriapsis
-        self.longitudeOfAscendingNode = longitudeOfAscendingNode
+    public init(meanLongitude L: [Double], semiMajorAxis a: Double, eccentricity e: [Double], inclination i: [Double], argumentOfPeriapsis w: [Double], longitudeOfAscendingNode W: [Double]) {
+        meanLongitude = L
+        semiMajorAxis = a
+        eccentricity = e
+        inclination = i
+        argumentOfPeriapsis = w
+        longitudeOfAscendingNode = W
         meanAnomaly = nil
         gravitationalParameter = µAU
     }
@@ -78,14 +78,14 @@ public struct OrbitalElements {
          - eccentricity: e
          - meanAnomaly: M (degrees)
      */
-    public init(meanLongitude: [Double], semiMajorAxis: Double, eccentricity: [Double], meanAnomaly: [Double]) {
-        self.meanLongitude = meanLongitude
-        self.semiMajorAxis = semiMajorAxis
-        self.eccentricity = eccentricity
+    public init(meanLongitude L: [Double], semiMajorAxis a: Double, eccentricity e: [Double], meanAnomaly M: [Double]) {
+        meanLongitude = L
+        semiMajorAxis = a
+        eccentricity = e
         inclination = nil
         argumentOfPeriapsis = nil
         longitudeOfAscendingNode = nil
-        self.meanAnomaly = meanAnomaly
+        meanAnomaly = M
         gravitationalParameter = µAU
     }
 
@@ -102,15 +102,15 @@ public struct OrbitalElements {
          - meanAnomalyAtEpoch: M0 (radians)
          - gravitationalParameter: GM (µ) (consistent units with semiMajorAxis)
      */
-    public init(meanLongitude: Double = 0, semiMajorAxis: Double, eccentricity: Double = 1, inclination: Double = 0, argumentOfPeriapsis: Double = 0, longitudeOfAscendingNode: Double = 0, meanAnomalyAtEpoch: Double = 0, gravitationalParameter: Double) {
-        self.meanLongitude = [meanLongitude]
-        self.semiMajorAxis = semiMajorAxis
-        self.eccentricity = [eccentricity]
-        self.inclination = [inclination]
-        self.argumentOfPeriapsis = [argumentOfPeriapsis]
-        self.longitudeOfAscendingNode = [longitudeOfAscendingNode]
-        self.meanAnomaly = [meanAnomalyAtEpoch]
-        self.gravitationalParameter = gravitationalParameter
+    public init(meanLongitude L: Double = 0, semiMajorAxis a: Double, eccentricity e: Double = 1, inclination i: Double = 0, argumentOfPeriapsis w: Double = 0, longitudeOfAscendingNode W: Double = 0, meanAnomalyAtEpoch M0: Double = 0, gravitationalParameter µ: Double) {
+        meanLongitude = [L]
+        semiMajorAxis = a
+        eccentricity = [e]
+        inclination = [i]
+        argumentOfPeriapsis = [w]
+        longitudeOfAscendingNode = [W]
+        meanAnomaly = [M0]
+        gravitationalParameter = µ
     }
 
     /**
@@ -170,17 +170,8 @@ public struct OrbitalElements {
      - returns: orbit at t.
      */
     public func orbit(atTrueAnomaly v: Double) -> Orbit {
-        let e = eccentricity[0]
-
-        // (4.40)
-        let a = e + cos(v)
-        let b = 1 + e * cos(v)
-        let E_ = acos(a / b)
-        let E = v > M_PI ? twoπ - E_ : E_
-
-        // (4.41)
-        let M = E - e * sin(E)
-        return Orbit(eccentricity: e, semiMajorAxis: semiMajorAxis, inclination: inclination![0], longitudeOfAscendingNode: longitudeOfAscendingNode![0], argumentOfPeriapsis: argumentOfPeriapsis![0], meanAnomaly: M, gravitationalParameter: gravitationalParameter)
+        let M = Orbit.meanAnomaly(trueAnomaly: v, eccentricity: eccentricity[0])
+        return Orbit(eccentricity: eccentricity[0], semiMajorAxis: semiMajorAxis, inclination: inclination![0], longitudeOfAscendingNode: longitudeOfAscendingNode![0], argumentOfPeriapsis: argumentOfPeriapsis![0], meanAnomaly: M, gravitationalParameter: gravitationalParameter)
     }
 
     public static let mars = OrbitalElements(meanLongitude: [ 293.737_334, 19_141.695_51, 0.000_3107 ],

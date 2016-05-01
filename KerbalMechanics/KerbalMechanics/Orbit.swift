@@ -33,6 +33,18 @@
 import Darwin
 
 public struct Orbit {
+
+    public static func meanAnomaly(trueAnomaly v: Double, eccentricity e: Double) -> Double {
+        // (4.40)
+        let a = e + cos(v)
+        let b = 1 + e * cos(v)
+        let E_ = acos(a / b)
+        let E = v > M_PI ? twoπ - E_ : E_
+
+        // (4.41)
+        return E - e * sin(E)
+    }
+
     /// shape of the ellipse, describing how much it is elongated compared to a circle
     public let eccentricity: Double
 
@@ -121,14 +133,39 @@ public struct Orbit {
          - meanAnomaly:
          - gravitationarlParameter:
      */
-    public init(eccentricity: Double, semiMajorAxis: Double, inclination: Double, longitudeOfAscendingNode: Double, argumentOfPeriapsis: Double, meanAnomaly: Double, gravitationalParameter: Double) {
-        self.eccentricity = eccentricity
-        self.semiMajorAxis = semiMajorAxis
-        self.inclination = inclination
-        self.longitudeOfAscendingNode = longitudeOfAscendingNode
-        self.argumentOfPeriapsis = argumentOfPeriapsis
-        self.meanAnomaly = meanAnomaly
-        self.gravitationalParameter = gravitationalParameter
+    public init(eccentricity e: Double, semiMajorAxis a: Double, inclination i: Double, longitudeOfAscendingNode W: Double, argumentOfPeriapsis w: Double, meanAnomaly M: Double, gravitationalParameter µ: Double) {
+        eccentricity = e
+        semiMajorAxis = a
+        inclination = i
+        longitudeOfAscendingNode = W
+        argumentOfPeriapsis = w
+        meanAnomaly = M
+        gravitationalParameter = µ
+    }
+
+    /**
+     Determine an orbit from a position and velocity.
+
+     */
+    public init(position r: Vector, velocity v: Vector, gravitationalParameter µ: Double) {
+        let h = r.cross(v)
+        let n = Vector.zAxis.cross(h)
+        let e: Vector = {
+            let a = r * (pow(v.magnitude, 2) - µ / r.magnitude)
+            let b = r.dot(v) * v
+            return (a - b) / µ
+        }()
+
+        semiMajorAxis = 1 / (2 / r.magnitude - pow(v.magnitude, 2) / µ)
+        eccentricity = e.magnitude
+        inclination = acos(h.z / h.magnitude)
+        let W = acos(n.x / n.magnitude)
+        longitudeOfAscendingNode = n.y >= 0 ? W : 2 * M_PI - W
+        let w = acos(n.dot(e) / n.magnitude / e.magnitude)
+        argumentOfPeriapsis = e.z >= 0 ? w : 2 * M_PI - w
+        let v = acos(e.dot(r) / e.magnitude / r.magnitude)
+        meanAnomaly = Orbit.meanAnomaly(trueAnomaly: v, eccentricity: eccentricity)
+        gravitationalParameter = µ
     }
 
 }

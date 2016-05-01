@@ -38,18 +38,12 @@ class VectorTests: XCTestCase {
         let a = Vector(x: 1, y: 2, z: 3)
         let b = Vector(x: 4, y: -5, z: 6)
         XCTAssertEqual(a.dot(b), 12)
-        XCTAssertEqual(a ** b, 12)
     }
 
     func testCross() {
         let a = Vector(x: 3, y: -3, z: 1)
         let b = Vector(x: 4, y: 9, z: 2)
-        var c = a
-        c *+= b
-
         XCTAssertEqual(a.cross(b), Vector(x: -15, y: -2, z: 39))
-        XCTAssertEqual(a *+ b, Vector(x: -15, y: -2, z: 39))
-        XCTAssertEqual(c, Vector(x: -15, y: -2, z: 39))
     }
 
     func testEquals() {

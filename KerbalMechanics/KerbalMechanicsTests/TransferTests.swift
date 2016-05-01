@@ -101,4 +101,21 @@ class TransferTests: XCTestCase {
         XCTAssertEqualWithAccuracy(v2.z, -663.3, accuracy: 0.05)
     }
 
+    /*
+     For the Mars transfer orbit in Problems 5.3 and 5.4, calculate the orbital
+     elements.
+     */
+    func test5_5() {
+        let earth = Vector(x: 0.473265, y: -0.899215, z: 0)
+        let mars = Vector(x: 0.066842, y: 1.561256, z: 0.030948)
+        let transfer = Transfer(fromOrigin: earth, toDestination: mars, duration: 207.0 * 24 * 60 * 60, gravitationalParameter: µAU)
+        let orbit = Orbit(position: transfer.origin, velocity: transfer.departureVelocity, gravitationalParameter: µAU)
+        XCTAssertEqualWithAccuracy(orbit.semiMajorAxis * AU, 1.97614e11, accuracy: 5e6)
+        XCTAssertEqualWithAccuracy(orbit.eccentricity, 0.230751, accuracy: 0.000005)
+        XCTAssertEqualWithAccuracy(orbit.inclination.degrees, 2.255, accuracy: 0.005)
+        XCTAssertEqualWithAccuracy(orbit.longitudeOfAscendingNode.degrees, 297.76, accuracy: 0.005)
+        XCTAssertEqualWithAccuracy(orbit.argumentOfPeriapsis.degrees, 359.77, accuracy: 0.05)
+        XCTAssertEqualWithAccuracy(orbit.trueAnomaly.degrees, 0.226, accuracy: 0.05)
+    }
+
 }

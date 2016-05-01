@@ -28,22 +28,6 @@
 //  IN THE SOFTWARE.
 //
 
-infix operator ** {
-    associativity left
-    precedence 150
-}
-
-infix operator *+ {
-    associativity left
-    precedence 150
-}
-
-infix operator *+= {
-    associativity right
-    precedence 90
-    assignment
-}
-
 public struct Vector {
 
     public let a: Double
@@ -67,7 +51,7 @@ public struct Vector {
 
     @warn_unused_result
     public func theta(vector: Vector) -> Double {
-        return acos(self ** vector / magnitude / vector.magnitude)
+        return acos(dot(vector) / magnitude / vector.magnitude)
     }
 
     @warn_unused_result
@@ -123,18 +107,6 @@ public extension Vector {
 @warn_unused_result
 public func ==(lhs: Vector, rhs: Vector) -> Bool {
     return lhs.a == rhs.a && lhs.b == rhs.b && lhs.c == rhs.c
-}
-
-public func **(lhs: Vector, rhs: Vector) -> Double {
-    return lhs.dot(rhs)
-}
-
-public func *+(lhs: Vector, rhs: Vector) -> Vector {
-    return lhs.cross(rhs)
-}
-
-public func *+=(inout lhs: Vector, rhs: Vector) {
-    lhs = lhs.cross(rhs)
 }
 
 public func *(lhs: Vector, rhs: Double) -> Vector {
