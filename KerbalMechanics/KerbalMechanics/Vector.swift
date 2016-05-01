@@ -5,6 +5,10 @@
 //  Created by jacob berkman on 2016-04-29.
 //  Copyright © 2016 jacob berkman.
 //
+//  Algorithms and equations compiled, edited and written in part by
+//  Robert A. Braeunig, 1997, 2005, 2007, 2008, 2011, 2012, 2013.
+//  http://www.braeunig.us/space/basics.htm
+//
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the “Software”), to
 //  deal in the Software without restriction, including without limitation the
@@ -41,27 +45,76 @@ infix operator *+= {
 }
 
 public struct Vector {
-    public let x: Double
-    public let y: Double
-    public let z: Double
 
-    @warn_unused_result
-    public func dot(b: Vector) -> Double {
-        return x * b.x + y * b.y + z * b.z
+    public let a: Double
+    public let b: Double
+    public let c: Double
+
+    public init(a: Double, b: Double, c: Double) {
+        self.a = a
+        self.b = b
+        self.c = c
+    }
+
+    public var magnitude: Double {
+        return sqrt(a * a + b * b + c * c)
     }
 
     @warn_unused_result
-    public func cross(b: Vector) -> Vector {
-        return Vector(x: y * b.z - z * b.y, y: z * b.x - x * b.z, z: x * b.y - y * b.x)
+    public func dot(vector: Vector) -> Double {
+        return a * vector.a + b * vector.b + c * vector.c
     }
+
+    @warn_unused_result
+    public func cross(vector: Vector) -> Vector {
+        return Vector(a: b * vector.c - c * vector.b, b: c * vector.a - a * vector.c, c: a * vector.b - b * vector.a)
+    }
+
+}
+
+extension Vector: Equatable { }
+
+public extension Vector {
+
+    public var x: Double { return a }
+    public var y: Double { return b }
+    public var z: Double { return c }
+
+    public init(x: Double, y: Double, z: Double) {
+        self.init(a: x, b: y, c: z)
+    }
+
+    public var polar: Vector {
+        let radius = magnitude
+        let longitude = atan(y / x)
+        let latitude = asin(z / radius)
+        return Vector(longitude: x >= 0 ? longitude : longitude + M_PI, latitude: latitude, radius: radius)
+    }
+
+}
+
+public extension Vector {
+
+    public var longitude: Double { return a }
+    public var latitude: Double { return b }
+    public var radius: Double { return c }
+
+    public init(longitude: Double, latitude: Double, radius: Double) {
+        self.init(a: longitude, b: latitude, c: radius)
+    }
+
+    public var cartesian: Vector {
+        return Vector(x: radius * cos(latitude) * cos(longitude),
+                      y: radius * cos(latitude) * sin(longitude),
+                      z: radius * sin(latitude))
+    }
+
 }
 
 @warn_unused_result
 public func ==(lhs: Vector, rhs: Vector) -> Bool {
-    return lhs.x == rhs.x && lhs.y == rhs.y && lhs.z == rhs.z
+    return lhs.a == rhs.a && lhs.b == rhs.b && lhs.c == rhs.c
 }
-
-extension Vector: Equatable { }
 
 public func **(lhs: Vector, rhs: Vector) -> Double {
     return lhs.dot(rhs)
@@ -76,7 +129,7 @@ public func *+=(inout lhs: Vector, rhs: Vector) {
 }
 
 public func *(lhs: Vector, rhs: Double) -> Vector {
-    return Vector(x: lhs.x * rhs, y: lhs.y * rhs, z: lhs.z * rhs)
+    return Vector(a: lhs.a * rhs, b: lhs.b * rhs, c: lhs.c * rhs)
 }
 
 public func *(lhs: Double, rhs: Vector) -> Vector {
@@ -96,7 +149,7 @@ public func /=(inout lhs: Vector, rhs: Double) {
 }
 
 public func +(lhs: Vector, rhs: Vector) -> Vector {
-    return Vector(x: lhs.x + rhs.x, y: lhs.y + rhs.y, z: lhs.z + rhs.z)
+    return Vector(a: lhs.a + rhs.a, b: lhs.b + rhs.b, c: lhs.c + rhs.c)
 }
 
 public func +=(inout lhs: Vector, rhs: Vector) {
@@ -104,7 +157,7 @@ public func +=(inout lhs: Vector, rhs: Vector) {
 }
 
 public prefix func -(lhs: Vector) -> Vector {
-    return Vector(x: -lhs.x, y: -lhs.y, z: -lhs.z)
+    return Vector(a: -lhs.a, b: -lhs.b, c: -lhs.c)
 }
 
 public func -(lhs: Vector, rhs: Vector) -> Vector {
