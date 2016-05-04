@@ -42,16 +42,6 @@ public struct Transfer {
     public let time: NSTimeInterval
     public let gravitationalParameter: Double
 
-    // (5.5)
-    var f: Double {
-        return 1 - destination.magnitude / parameter * (1 - cos(trueAnomaly))
-    }
-
-    // (5.6)
-    var g: Double {
-        return origin.magnitude * destination.magnitude * sin(trueAnomaly) / sqrt(gravitationalParameter * parameter)
-    }
-
     // (5.3)
     public var departureVelocity: Vector {
         return (destination - origin * f) / g
@@ -68,6 +58,20 @@ public struct Transfer {
 
         let g_ = 1 - r1 * (1 - cos(trueAnomaly)) / parameter
         return origin * f_ + departureVelocity * g_
+    }
+
+    // (5.5)
+    var f: Double {
+        return 1 - destination.magnitude / parameter * (1 - cos(trueAnomaly))
+    }
+
+    // (5.6)
+    var g: Double {
+        return origin.magnitude * destination.magnitude * sin(trueAnomaly) / sqrt(gravitationalParameter * parameter)
+    }
+    
+    public var orbit: Orbit {
+        return Orbit(position: origin, velocity: departureVelocity, gravitationalParameter: gravitationalParameter)
     }
 
     public init(fromOrigin origin: Vector, toDestination destination: Vector, duration: NSTimeInterval, gravitationalParameter: Double) {
@@ -94,7 +98,7 @@ public struct Transfer {
         // Pick a trial value of p within the appropriate limits.
         let p0: Double
         let p1: Double
-        if trueAnomaly < M_PI {
+        if trueAnomaly < π {
             // (5.18)
             let pi = k / (l + sqrt(2 * m))
             p0 = (r1 + r2) / 2

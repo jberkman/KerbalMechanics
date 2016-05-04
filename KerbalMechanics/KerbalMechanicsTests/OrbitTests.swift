@@ -47,7 +47,7 @@ class OrbitTests: XCTestCase {
         let elements = OrbitalElements(semiMajorAxis: 7_500_000, eccentricity: 0.1, gravitationalParameter: µ)
         let orbit0 = elements.orbit(atTrueAnomaly: 30.radians)
         let orbit1 = elements.orbit(atTrueAnomaly: 90.radians)
-        let t = (orbit1.meanAnomaly - orbit0.meanAnomaly) / orbit1.meanMotion
+        let t = orbit0.seconds(toMeanAnomaly: orbit1.meanAnomaly)
         XCTAssertEqualWithAccuracy(t, 968.4, accuracy: 0.05)
     }
 

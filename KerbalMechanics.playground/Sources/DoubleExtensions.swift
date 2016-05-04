@@ -30,22 +30,22 @@
 
 import Darwin
 
-let π = M_PI
-let twoπ = 2 * π
+public let π = M_PI
+public let twoπ = 2 * π
 
 extension Double {
 
-    var radians: Double {
+    public var radians: Double {
         return self * π / 180
     }
 
-    var normalizedRadians: Double {
+    public var normalizedRadians: Double {
         guard self >= 0 else { return (self % twoπ) + twoπ }
         guard self < twoπ else { return self % twoπ }
         return self
     }
 
-    var degrees: Double {
+    public var degrees: Double {
         return self * 180 / π
     }
 

@@ -39,10 +39,14 @@ public struct Orbit {
         let a = e + cos(v)
         let b = 1 + e * cos(v)
         let E_ = acos(a / b)
-        let E = v > M_PI ? twoπ - E_ : E_
+        let E = v > π ? twoπ - E_ : E_
 
         // (4.41)
         return E - e * sin(E)
+    }
+
+    public static func phi(radius r: Vector, velocity v: Vector) -> Double {
+        return acos((r.cross(v) / r.magnitude / v.magnitude).magnitude)
     }
 
     /// shape of the ellipse, describing how much it is elongated compared to a circle
@@ -66,6 +70,16 @@ public struct Orbit {
     public let meanAnomaly: Double
 
     public let gravitationalParameter: Double
+
+    // (4.21)
+    public var periapsis: Double {
+        return semiMajorAxis * (1 - eccentricity)
+    }
+
+    // (4.22)
+    public var apoapsis: Double {
+        return semiMajorAxis * (1 * eccentricity)
+    }
 
     // (4.39)
     public var meanMotion: Double {
@@ -117,7 +131,7 @@ public struct Orbit {
         let u = trueAnomaly + argumentOfPeriapsis
         let l_ = cos(inclination) * sin(u) / cos(u)
         let l = atan(l_) + longitudeOfAscendingNode
-        let lOffset = l_ >= 0 ? 0 : M_PI
+        let lOffset = l_ >= 0 ? 0 : π
         let b = asin(sin(u) * sin(inclination))
         return Vector(longitude: (l + lOffset).normalizedRadians, latitude: b, radius: radius)
     }
@@ -145,7 +159,10 @@ public struct Orbit {
 
     /**
      Determine an orbit from a position and velocity.
-
+     - parameters:
+         - position: Cartesian coordinates of object
+         - velocity: Cartesian velocity of object.
+         - gravitationalParameter: GM for body being orbited.
      */
     public init(position r: Vector, velocity v: Vector, gravitationalParameter µ: Double) {
         let h = r.cross(v)
@@ -160,12 +177,40 @@ public struct Orbit {
         eccentricity = e.magnitude
         inclination = acos(h.z / h.magnitude)
         let W = acos(n.x / n.magnitude)
-        longitudeOfAscendingNode = n.y >= 0 ? W : 2 * M_PI - W
+        longitudeOfAscendingNode = n.y >= 0 ? W : twoπ - W
         let w = acos(n.dot(e) / n.magnitude / e.magnitude)
-        argumentOfPeriapsis = e.z >= 0 ? w : 2 * M_PI - w
+        argumentOfPeriapsis = e.z >= 0 ? w : twoπ - w
         let v = acos(e.dot(r) / e.magnitude / r.magnitude)
         meanAnomaly = Orbit.meanAnomaly(trueAnomaly: v, eccentricity: eccentricity)
         gravitationalParameter = µ
+    }
+
+    // (4.38)
+    public func seconds(toMeanAnomaly M: Double) -> NSTimeInterval {
+        let M_: Double = {
+            if M > meanAnomaly { return M }
+            if twoπ - M > meanAnomaly { return twoπ - M }
+            return twoπ + M
+        }()
+        return (M_ - meanAnomaly) / meanMotion
+    }
+
+    // (4.43)
+    public func trueAnomaly(atRadius r: Double) -> Double? {
+        guard eccentricity > 1 || apoapsis > r else { return nil }
+        return acos((semiMajorAxis * (1 - eccentricity * eccentricity) / r - 1) / eccentricity)
+    }
+
+    // (4.89)
+    public func SOIRadius(withGravitationalParameter µ: Double) -> Double {
+        return radius * pow(µ / gravitationalParameter, 0.4)
+    }
+
+    public func secondsToLeaveSOI(ofBodyWithOrbit orbit: Orbit) -> NSTimeInterval? {
+        let rSOI = orbit.SOIRadius(withGravitationalParameter: gravitationalParameter)
+        guard let v = trueAnomaly(atRadius: rSOI) else { return nil }
+        let M = Orbit.meanAnomaly(trueAnomaly: v, eccentricity: eccentricity)
+        return seconds(toMeanAnomaly: M)
     }
 
 }

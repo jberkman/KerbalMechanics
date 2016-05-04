@@ -32,6 +32,8 @@
 
 import Darwin
 
+let µAU = 3.964016e-14
+
 public struct OrbitalElements {
 
     let meanLongitude: [Double]

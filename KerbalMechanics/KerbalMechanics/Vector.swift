@@ -44,6 +44,10 @@ public struct Vector {
         return sqrt(a * a + b * b + c * c)
     }
 
+    public var normalized: Vector {
+        return self / magnitude
+    }
+
     @warn_unused_result
     public func dot(vector: Vector) -> Double {
         return a * vector.a + b * vector.b + c * vector.c
@@ -63,6 +67,14 @@ public struct Vector {
 
 extension Vector: Equatable { }
 
+extension Vector: CustomStringConvertible {
+    /// A textual representation of `self`.
+    public var description: String {
+        return "(\(a), \(b), \(c))"
+    }
+
+}
+
 public extension Vector {
 
     public static let xAxis = Vector(x: 1, y: 0, z: 0)
@@ -81,7 +93,7 @@ public extension Vector {
         let radius = magnitude
         let longitude = atan(y / x)
         let latitude = asin(z / radius)
-        return Vector(longitude: x >= 0 ? longitude : longitude + M_PI, latitude: latitude, radius: radius)
+        return Vector(longitude: x >= 0 ? longitude : longitude + π, latitude: latitude, radius: radius)
     }
 
 }

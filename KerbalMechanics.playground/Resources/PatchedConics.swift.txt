@@ -1,0 +1,123 @@
+//: Playground - noun: a place where people can play
+
+import KerbalMechanics
+
+let AU = 149_597_870_000.0
+
+// Sun
+let µ1 = 1.32712438e20
+
+// Earth
+let µ2 = 3.986005e14
+let earth = Vector(x: 0.473265, y: -0.899215, z: 0) * AU
+let r0 = earth.magnitude
+let v0 = Vector(x: 25876.6, y: 13759.5, z: 0)
+let p0 = Orbit.phi(radius: earth, velocity: v0)
+
+let mars = Vector(x: 0.066842, y: 1.561256, z: 0.030948) * AU
+let transfer = Transfer(fromOrigin: earth, toDestination: mars, duration: 207.0 * 24 * 60 * 60, gravitationalParameter: µ1)
+let orbit = transfer.orbit
+
+p0.degrees
+
+let v2 = transfer.departureVelocity
+
+let v1 = v2 - v0
+let p1 = 0.001 // unknown
+let i1 = atan(-v1.z / v1.y) // unknown
+let h2 = earth.cross(v2) // unknown
+let i2 = orbit.inclination
+
+let r1 = r0 * pow(µ1 / µ2, 0.4)
+let k = 1.0
+
+let oSRT2: Double = {
+let a = r1 * v0.magnitude * sin(p0)
+let b = r1 * v0.magnitude * cos(p0) + r0 * k * v1.magnitude
+return atan(-a / b)
+}()
+
+let bSRT2: Double = {
+let a = h2.magnitude * sin(i2) * sin(oSRT2)
+let b = r1 * v0.magnitude * sin(p0)
+return asin(-a / b)
+}()
+
+let a = r0 * k * v1.magnitude + r1 * v0.magnitude * cos(p0)
+let b = r1 * v0.magnitude * sin(p0)
+func sinQuadAngle(c: Double) -> Double {
+let quad = -a * c + b * sqrt(a * a + b * b - c * c)
+asin(-a / c)
+let ret = asin(quad / (a * a + b * b))
+if ret > asin(-a / c) {
+return ret
+}
+
+let d = -a * c - b * sqrt(a * a + b * b - c * c)
+let ret2 = asin(d / (a * a + b * b))
+//        assert(lSRT2 < asin(-a / c))
+return ret2
+}
+
+let lSRT2: Double = {
+let c = (h2.magnitude * cos(i2) - r0 * v0.magnitude * sin(p0)) / cos(bSRT2)
+return sinQuadAngle(c)
+}()
+
+bSRT2.degrees
+lSRT2.degrees
+
+let lDRT: Double = {
+let c = -r0 * v0.magnitude * sin(p0)
+return sinQuadAngle(c)
+}()
+
+let gSRT1 = v1.magnitude * sin(p1) * sin(lDRT) / v0.magnitude / sin(p0)
+
+let i1_ = acos(cos(i1) / cos(bSRT2))
+let dB = asin(sin(i1_) * sin(gSRT1))
+let dL = atan(cos(i1_) * tan(gSRT1))
+
+let bNRT = bSRT2 + dB
+let lNRT = lSRT2 + dL
+
+let W1 = lNRT + asin(tan(bNRT) / tan(i1))
+let w1 = asin(sin(bNRT) / sin(i1))
+
+let pos1: Vector = {
+let x = r1 * (cos(W1) * cos(w1) + sin(W1) * cos(i1) * sin(w1))
+let y = r1 * (sin(W1) * cos(w1) - cos(W1) * cos(i1) * sin(w1))
+let z = r1 * sin(i1) * sin(w1)
+return Vector(x: x, y: y, z: z)
+}()
+
+let vx1: Double = {
+let a = sin(p1) * (cos(W1) * sin(w1) - sin(W1) * cos(i1) * cos(w1))
+let b = cos(p1) * (cos(W1) * cos(w1) + sin(W1) * cos(i1) * sin(w1))
+return v1.magnitude * (a - b)
+}()
+v1.x
+
+let vy1: Double = {
+let a = sin(p1) * (sin(W1) * sin(w1) + cos(W1) * cos(i1) * cos(w1))
+let b = cos(p1) * (sin(W1) * cos(w1) - cos(W1) * cos(i1) * sin(w1))
+return v1.magnitude * (a - b)
+}()
+v1.y
+
+let vz1: Double = {
+let a = sin(p1) * sin(i1) * cos(w1)
+let b = cos(p1) * sin(i1) * sin(w1)
+return v1.magnitude * (-a - b)
+}()
+v1.z
+
+let pos2 = Vector(x: r0 - pos1.x, y: -pos1.y, z: pos1.z)
+let vx2 = -vx1 - v0.magnitude * cos(p0)
+v2.x
+
+let vy2 = -vy1 + v0.magnitude * sin(p0)
+v2.y
+
+let vz2 = vz1
+v2.z
