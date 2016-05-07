@@ -1,8 +1,8 @@
 //
-//  DoubleExtensions.swift
+//  CelestialExtensions.swift
 //  KerbalMechanics
 //
-//  Created by jacob berkman on 2016-04-29.
+//  Created by jacob berkman on 2016-05-04.
 //  Copyright © 2016 jacob berkman.
 //
 //  Algorithms and equations compiled, edited and written in part by
@@ -28,38 +28,22 @@
 //  IN THE SOFTWARE.
 //
 
-import Darwin
+extension Moon {
 
-extension Int {
-
-    var π: Double {
-        return Double(self) * M_PI
-    }
+    public var planet: Planet { return orbit.celestialBody as! Planet }
 
 }
 
-extension Double {
+extension Planet {
 
-    var AU: Double {
-        return self * 149_597_870_000.0
-    }
+    public var star: Star { return orbit.celestialBody as! Star }
+        
+}
 
-    var π: Double {
-        return self * M_PI
-    }
+extension Orbiting {
 
-    var radians: Double {
-        return π / 180
-    }
-
-    var normalizedRadians: Double {
-        guard self >= 0 else { return (self % 2.π) + 2.π }
-        guard self < 2.π else { return self % 2.π }
-        return self
-    }
-
-    var degrees: Double {
-        return self * 180 / 1.π
+    func orbit(at t: NSTimeInterval) -> Orbit {
+        return Orbit(elements: orbit, atTime: t)
     }
 
 }

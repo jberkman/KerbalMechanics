@@ -1,13 +1,15 @@
 //
-//  DoubleExtensions.swift
-//  KerbalMechanics
+//  CelestialProtocols.swift
 //
-//  Created by jacob berkman on 2016-04-29.
+//
+//  Created by jacob berkman on 2016-05-04.
 //  Copyright © 2016 jacob berkman.
 //
 //  Algorithms and equations compiled, edited and written in part by
 //  Robert A. Braeunig, 1997, 2005, 2007, 2008, 2011, 2012, 2013.
 //  http://www.braeunig.us/space/basics.htm
+//
+//  Some descriptions from https://en.wikipedia.org/wiki/Orbital_elements
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the “Software”), to
@@ -28,38 +30,22 @@
 //  IN THE SOFTWARE.
 //
 
-import Darwin
-
-extension Int {
-
-    var π: Double {
-        return Double(self) * M_PI
-    }
-
+public protocol CelestialBody {
+    var name: String { get }
+    var gravitationalParameter: Double { get }
+    var radius: Double { get }
 }
 
-extension Double {
+public protocol Orbiting {
+    var orbit: OrbitalElements { get }
+}
 
-    var AU: Double {
-        return self * 149_597_870_000.0
-    }
+public protocol Moon: CelestialBody, Orbiting { }
 
-    var π: Double {
-        return self * M_PI
-    }
+public protocol Planet: CelestialBody, Orbiting {
+    var moons: [Moon] { get }
+}
 
-    var radians: Double {
-        return π / 180
-    }
-
-    var normalizedRadians: Double {
-        guard self >= 0 else { return (self % 2.π) + 2.π }
-        guard self < 2.π else { return self % 2.π }
-        return self
-    }
-
-    var degrees: Double {
-        return self * 180 / 1.π
-    }
-
+public protocol Star: CelestialBody {
+    var planets: [Planet] { get }
 }

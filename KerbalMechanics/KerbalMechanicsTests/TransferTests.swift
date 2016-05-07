@@ -45,14 +45,16 @@ class TransferTests: XCTestCase {
      axis of the transfer orbit is 1.300 AU.
      */
     func test5_1() {
-        let rA = AU
-        let rB = 1.524 * AU
-        let aTX = 1.3 * AU
+        let rA = 1.AU
+        let rB = 1.524.AU
+        let aTX = 1.3.AU
 
         let e = 1 - rA / aTX
         let v = acos((aTX * (1 - e * e) / rB - 1) / e)
-        let orbit = OrbitalElements(semiMajorAxis: aTX, eccentricity: e, gravitationalParameter: µSun).orbit(atTrueAnomaly: v)
-        let t = orbit.meanAnomaly / orbit.meanMotion
+        let elements = OrbitalElements(celestialBody: Sol.instance, a: aTX, e: e)
+        let orbit = Orbit(elements: elements, atTime: 0)
+        let M = Orbit.meanAnomaly(trueAnomaly: v, eccentricity: e)
+        let t = orbit.seconds(toMeanAnomaly: M)
         XCTAssertEqualWithAccuracy(v.degrees, 146.488, accuracy: 0.0005)
         XCTAssertEqualWithAccuracy(t / 24 / 60 / 60, 194.77, accuracy: 0.05)
     }
@@ -75,11 +77,11 @@ class TransferTests: XCTestCase {
      Calculate the parameter and semi-major axis of the transfer orbit.
      */
     func test5_3() {
-        let earth = Vector(x: 0.473265, y: -0.899215, z: 0)
-        let mars = Vector(x: 0.066842, y: 1.561256, z: 0.030948)
-        let transfer = Transfer(fromOrigin: earth, toDestination: mars, duration: 207.0 * 24 * 60 * 60, gravitationalParameter: µAU)
-        XCTAssertEqualWithAccuracy(transfer.parameter, 1.250633, accuracy: 0.000005)
-        XCTAssertEqualWithAccuracy(transfer.semiMajorAxis, 1.320971, accuracy: 0.00005)
+        let earth = Vector(x: 0.473265, y: -0.899215, z: 0) * 1.AU
+        let mars = Vector(x: 0.066842, y: 1.561256, z: 0.030948) * 1.AU
+        let transfer = Transfer(around: Sol.instance, fromOrigin: earth, toDestination: mars, duration: 207.0 * 24 * 60 * 60)
+        XCTAssertEqualWithAccuracy(transfer.parameter / 1.AU, 1.250633, accuracy: 0.000005)
+        XCTAssertEqualWithAccuracy(transfer.semiMajorAxis / 1.AU, 1.320971, accuracy: 0.00005)
         XCTAssertEqualWithAccuracy(transfer.time / 24 / 60 / 60, 206.9999, accuracy: 0.005)
     }
 
@@ -88,11 +90,11 @@ class TransferTests: XCTestCase {
      velocity vectors.
      */
     func test5_4() {
-        let earth = Vector(x: 0.473265, y: -0.899215, z: 0)
-        let mars = Vector(x: 0.066842, y: 1.561256, z: 0.030948)
-        let transfer = Transfer(fromOrigin: earth, toDestination: mars, duration: 207.0 * 24 * 60 * 60, gravitationalParameter: µAU)
-        let v1 = transfer.departureVelocity * AU
-        let v2 = transfer.captureVelocity * AU
+        let earth = Vector(x: 0.473265, y: -0.899215, z: 0) * 1.AU
+        let mars = Vector(x: 0.066842, y: 1.561256, z: 0.030948) * 1.AU
+        let transfer = Transfer(around: Sol.instance, fromOrigin: earth, toDestination: mars, duration: 207.0 * 24 * 60 * 60)
+        let v1 = transfer.departureVelocity
+        let v2 = transfer.captureVelocity
         XCTAssertEqualWithAccuracy(v1.x, 28996.2, accuracy: 0.5)
         XCTAssertEqualWithAccuracy(v1.y, 15232.7, accuracy: 0.5)
         XCTAssertEqualWithAccuracy(v1.z, 1289.2, accuracy: 0.05)
@@ -106,11 +108,11 @@ class TransferTests: XCTestCase {
      elements.
      */
     func test5_5() {
-        let earth = Vector(x: 0.473265, y: -0.899215, z: 0)
-        let mars = Vector(x: 0.066842, y: 1.561256, z: 0.030948)
-        let transfer = Transfer(fromOrigin: earth, toDestination: mars, duration: 207.0 * 24 * 60 * 60, gravitationalParameter: µAU)
-        let orbit = Orbit(position: transfer.origin, velocity: transfer.departureVelocity, gravitationalParameter: µAU)
-        XCTAssertEqualWithAccuracy(orbit.semiMajorAxis * AU, 1.97614e11, accuracy: 5e6)
+        let earth = Vector(x: 0.473265, y: -0.899215, z: 0) * 1.AU
+        let mars = Vector(x: 0.066842, y: 1.561256, z: 0.030948) * 1.AU
+        let transfer = Transfer(around: Sol.instance, fromOrigin: earth, toDestination: mars, duration: 207.0 * 24 * 60 * 60)
+        let orbit = Orbit(around: Sol.instance, position: transfer.origin, velocity: transfer.departureVelocity)
+        XCTAssertEqualWithAccuracy(orbit.semiMajorAxis, 1.97614e11, accuracy: 5e6)
         XCTAssertEqualWithAccuracy(orbit.eccentricity, 0.230751, accuracy: 0.000005)
         XCTAssertEqualWithAccuracy(orbit.inclination.degrees, 2.255, accuracy: 0.005)
         XCTAssertEqualWithAccuracy(orbit.longitudeOfAscendingNode.degrees, 297.76, accuracy: 0.005)

@@ -1,8 +1,8 @@
 //
-//  DoubleExtensions.swift
+//  TimeTests.swift
 //  KerbalMechanics
 //
-//  Created by jacob berkman on 2016-04-29.
+//  Created by jacob berkman on 2016-05-05.
 //  Copyright © 2016 jacob berkman.
 //
 //  Algorithms and equations compiled, edited and written in part by
@@ -28,38 +28,32 @@
 //  IN THE SOFTWARE.
 //
 
-import Darwin
+import XCTest
 
-extension Int {
+@testable import KerbalMechanics
 
-    var π: Double {
-        return Double(self) * M_PI
+class TimeTests: XCTestCase {
+
+    func testJulianTime() {
+        let comps = NSDateComponents()
+        comps.year = 1976
+        comps.month = 7
+        comps.day = 20
+        comps.hour = 12
+        let t = comps.julianTimeInterval
+        XCTAssertEqual(t / 24 / 60 / 60, 2442980.0)
+        XCTAssertEqualWithAccuracy(t.julianCenturies, 0.765503080, accuracy: 0.0000000005)
     }
 
-}
-
-extension Double {
-
-    var AU: Double {
-        return self * 149_597_870_000.0
-    }
-
-    var π: Double {
-        return self * M_PI
-    }
-
-    var radians: Double {
-        return π / 180
-    }
-
-    var normalizedRadians: Double {
-        guard self >= 0 else { return (self % 2.π) + 2.π }
-        guard self < 2.π else { return self % 2.π }
-        return self
-    }
-
-    var degrees: Double {
-        return self * 180 / 1.π
+    func testJulianTime2() {
+        let comps = NSDateComponents()
+        comps.year = 1900
+        comps.month = 1
+        comps.day = 0
+        comps.hour = 12
+        let t = comps.julianTimeInterval
+        XCTAssertEqual(t / 24 / 60 / 60, 2415020.0)
+        XCTAssertEqual(t.julianCenturies, 0)
     }
 
 }

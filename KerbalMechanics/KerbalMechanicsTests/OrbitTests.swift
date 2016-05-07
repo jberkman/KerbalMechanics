@@ -32,10 +32,6 @@ import XCTest
 
 @testable import KerbalMechanics
 
-private let µ = 3.986005e14
-private let µSun = 1.327124e20
-private let AU = 149.597870e9
-
 class OrbitTests: XCTestCase {
 
     /*
@@ -44,10 +40,10 @@ class OrbitTests: XCTestCase {
      perigee to 90 degrees past perigee.
      */
     func test4_13() {
-        let elements = OrbitalElements(semiMajorAxis: 7_500_000, eccentricity: 0.1, gravitationalParameter: µ)
-        let orbit0 = elements.orbit(atTrueAnomaly: 30.radians)
-        let orbit1 = elements.orbit(atTrueAnomaly: 90.radians)
-        let t = orbit0.seconds(toMeanAnomaly: orbit1.meanAnomaly)
+        let elements = OrbitalElements(celestialBody: Sol.instance.earth, a: 7_500_000, e: 0.1)
+        let orbit30 = Orbit(elements: elements, atTime: 0).orbit(at: 30.radians)
+        let orbit90 = orbit30.orbit(at: 90.radians)
+        let t = orbit30.seconds(toMeanAnomaly: orbit90.meanAnomaly)
         XCTAssertEqualWithAccuracy(t, 968.4, accuracy: 0.05)
     }
 
@@ -56,11 +52,9 @@ class OrbitTests: XCTestCase {
      satellite's position, i.e. it's true anomaly, 20 minutes later?
      */
     func test4_14() {
-        let elements = OrbitalElements(semiMajorAxis: 7_500_000, eccentricity: 0.1, gravitationalParameter: µ)
-        let orbit0 = elements.orbit(atTrueAnomaly: 90.radians)
-        let t = orbit0.meanAnomaly / orbit0.meanMotion
-        let orbit1 = elements.orbit(atSecond: t + 20 * 60)
-        let v = orbit1.trueAnomaly
+        let elements = OrbitalElements(celestialBody: Sol.instance.earth, a: 7_500_000, e: 0.1)
+        let orbit = Orbit(elements: elements, atTime: 0).orbit(at: 90.radians).orbit(after: 20 * 60)
+        let v = orbit.trueAnomaly
         XCTAssertEqualWithAccuracy(v.degrees, 151.3, accuracy: 0.05)
     }
 
@@ -70,8 +64,8 @@ class OrbitTests: XCTestCase {
      is 225 degrees.
      */
     func test4_15() {
-        let elements = OrbitalElements(semiMajorAxis: 7_500_000, eccentricity: 0.1, gravitationalParameter: µ)
-        let orbit = elements.orbit(atTrueAnomaly: 225.radians)
+        let elements = OrbitalElements(celestialBody: Sol.instance.earth, a: 7_500_000, e: 0.1)
+        let orbit = Orbit(elements: elements, atTime: 0).orbit(at: 225.radians)
         XCTAssertEqualWithAccuracy(orbit.radius, 7_989_977, accuracy: 0.5)
         XCTAssertEqualWithAccuracy(orbit.azimuth.degrees, -4.351, accuracy: 0.0005)
         XCTAssertEqualWithAccuracy(orbit.velocity, 6_828, accuracy: 0.5)
@@ -83,9 +77,9 @@ class OrbitTests: XCTestCase {
      T = (2442980.0 – 2415020.0) / 36525 = 0.765503080
      */
     func testOrbitOfMars() {
-        let orbit = OrbitalElements.mars.orbit(atJulianCentury: 0.765503080)
+        let orbit = Sol.instance.mars.orbit(at: 2442980.0 * 24 * 60 * 60)
         XCTAssertEqualWithAccuracy(orbit.longitudeOfAscendingNode.degrees, 49.376635, accuracy: 0.000005)
-        XCTAssertEqualWithAccuracy(orbit.semiMajorAxis, 1.5236883, accuracy: 0.00000005)
+        XCTAssertEqualWithAccuracy(orbit.semiMajorAxis / 1.AU, 1.5236883, accuracy: 0.00000005)
         XCTAssertEqualWithAccuracy(orbit.eccentricity, 0.093383330, accuracy: 0.0000000005)
         XCTAssertEqualWithAccuracy(orbit.inclination.degrees, 1.849824, accuracy: 0.005)
         XCTAssertEqualWithAccuracy(orbit.argumentOfPeriapsis.degrees, 286.250750, accuracy: 0.0000005)
@@ -96,9 +90,9 @@ class OrbitTests: XCTestCase {
      Calculate the orbital elements of Earth on 1976-July-20, 12:00 UT.
      */
     func testOrbitOfEarth() {
-        let orbit = OrbitalElements.earth.orbit(atJulianCentury: 0.765503080)
+        let orbit = Sol.instance.earth.orbit(at: 2442980.0 * 24 * 60 * 60)
         XCTAssertEqual(orbit.longitudeOfAscendingNode.degrees, 0)
-        XCTAssertEqual(orbit.semiMajorAxis, 1.0000002)
+        XCTAssertEqualWithAccuracy(orbit.semiMajorAxis / 1.AU, 1.0000002, accuracy: 0.00005)
         XCTAssertEqualWithAccuracy(orbit.eccentricity, 0.016718968, accuracy: 0.0000000005)
         XCTAssertEqual(orbit.inclination, 0)
         XCTAssertEqual(orbit.argumentOfPeriapsis, 0)
@@ -109,11 +103,11 @@ class OrbitTests: XCTestCase {
      Calculate the heliocentric ecliptical coordinates of Mars on 1976-July-20, 12:00 UT.
      */
     func testHelioEclipticMars() {
-        let orbit = OrbitalElements.mars.orbit(atJulianCentury: 0.765503080)
+        let orbit = Sol.instance.mars.orbit(at: 2442980.0 * 24 * 60 * 60)
         let position = orbit.position
         XCTAssertEqualWithAccuracy(position.longitude.degrees, 181.756494, accuracy: 0.00005)
         XCTAssertEqualWithAccuracy(position.latitude.degrees, 1.366666, accuracy: 0.005)
-        XCTAssertEqualWithAccuracy(position.radius, 1.648641, accuracy: 0.0000005)
+        XCTAssertEqualWithAccuracy(position.radius / 1.AU, 1.648641, accuracy: 0.0000005)
     }
 
 }

@@ -93,7 +93,7 @@ public extension Vector {
         let radius = magnitude
         let longitude = atan(y / x)
         let latitude = asin(z / radius)
-        return Vector(longitude: x >= 0 ? longitude : longitude + π, latitude: latitude, radius: radius)
+        return Vector(longitude: x >= 0 ? longitude : longitude + 1.π, latitude: latitude, radius: radius)
     }
 
 }

@@ -39,7 +39,7 @@ public struct Orbit {
         let a = e + cos(v)
         let b = 1 + e * cos(v)
         let E_ = acos(a / b)
-        let E = v > π ? twoπ - E_ : E_
+        let E = v > 1.π ? 2.π - E_ : E_
 
         // (4.41)
         return E - e * sin(E)
@@ -48,6 +48,8 @@ public struct Orbit {
     public static func phi(radius r: Vector, velocity v: Vector) -> Double {
         return acos((r.cross(v) / r.magnitude / v.magnitude).magnitude)
     }
+
+    public let celestialBody: CelestialBody
 
     /// shape of the ellipse, describing how much it is elongated compared to a circle
     public let eccentricity: Double
@@ -69,8 +71,6 @@ public struct Orbit {
     /// the position of the orbiting body along the ellipse at a specific time
     public let meanAnomaly: Double
 
-    public let gravitationalParameter: Double
-
     // (4.21)
     public var periapsis: Double {
         return semiMajorAxis * (1 - eccentricity)
@@ -83,7 +83,7 @@ public struct Orbit {
 
     // (4.39)
     public var meanMotion: Double {
-        return sqrt(gravitationalParameter / pow(semiMajorAxis, 3))
+        return sqrt(celestialBody.gravitationalParameter / pow(semiMajorAxis, 3))
     }
 
     // (4.41)
@@ -115,7 +115,7 @@ public struct Orbit {
 
     // (4.45)
     public var velocity: Double {
-        return sqrt(gravitationalParameter * (2 / radius - 1 / semiMajorAxis))
+        return sqrt(celestialBody.gravitationalParameter * (2 / radius - 1 / semiMajorAxis))
     }
 
     // http://www.braeunig.us/space/plntpos.htm#coordinates
@@ -131,11 +131,47 @@ public struct Orbit {
         let u = trueAnomaly + argumentOfPeriapsis
         let l_ = cos(inclination) * sin(u) / cos(u)
         let l = atan(l_) + longitudeOfAscendingNode
-        let lOffset = l_ >= 0 ? 0 : π
+        let lOffset = l_ >= 0 ? 0 : 1.π
         let b = asin(sin(u) * sin(inclination))
         return Vector(longitude: (l + lOffset).normalizedRadians, latitude: b, radius: radius)
     }
 
+    /**
+     Determine the orbit, and position on that orbit, at the given date.
+     See http://www.braeunig.us/space/plntpos.htm for explanation.
+
+     - parameter:
+         - elements: Orbital elements defining this orbit
+         - t: Time interval from epoch (Julian or Kerbal)
+     */
+    public init(elements: OrbitalElements, atTime t: NSTimeInterval) {
+        let julianCenturies = t.julianCenturies
+        let timeTerms = (0 ..< elements.maxLength).map { pow(julianCenturies, Double($0)) }
+
+        func eval(terms: [Double]) -> Double {
+            return zip(terms, timeTerms).reduce(0) { $0 + $1.0 * $1.1 }
+        }
+
+        celestialBody = elements.celestialBody
+        eccentricity = eval(elements.eccentricity)
+        semiMajorAxis = elements.semiMajorAxis
+        inclination = eval(elements.inclination)
+        argumentOfPeriapsis = eval(elements.argumentOfPeriapsis).normalizedRadians
+        longitudeOfAscendingNode = eval(elements.longitudeOfAscendingNode).normalizedRadians
+
+        switch elements.meanAnomaly.count {
+        case 0:
+            meanAnomaly = (eval(elements.meanLongitude) - argumentOfPeriapsis - longitudeOfAscendingNode).normalizedRadians
+
+        case 1:
+            let n = sqrt(celestialBody.gravitationalParameter / pow(semiMajorAxis, 3))
+            meanAnomaly = (elements.meanAnomaly[0] + t * n).normalizedRadians
+
+        default:
+            meanAnomaly = eval(elements.meanAnomaly).normalizedRadians
+        }
+    }
+    
     /**
      Standard constructor accepting explicitly defined elements.
      - parameters:
@@ -147,14 +183,14 @@ public struct Orbit {
          - meanAnomaly:
          - gravitationarlParameter:
      */
-    public init(eccentricity e: Double, semiMajorAxis a: Double, inclination i: Double, longitudeOfAscendingNode W: Double, argumentOfPeriapsis w: Double, meanAnomaly M: Double, gravitationalParameter µ: Double) {
+    public init(around body: CelestialBody, eccentricity e: Double, semiMajorAxis a: Double, inclination i: Double, longitudeOfAscendingNode W: Double, argumentOfPeriapsis w: Double, meanAnomaly M: Double) {
+        celestialBody = body
         eccentricity = e
         semiMajorAxis = a
         inclination = i
         longitudeOfAscendingNode = W
         argumentOfPeriapsis = w
         meanAnomaly = M
-        gravitationalParameter = µ
     }
 
     /**
@@ -164,33 +200,53 @@ public struct Orbit {
          - velocity: Cartesian velocity of object.
          - gravitationalParameter: GM for body being orbited.
      */
-    public init(position r: Vector, velocity v: Vector, gravitationalParameter µ: Double) {
+    public init(around body: CelestialBody, position r: Vector, velocity v: Vector) {
         let h = r.cross(v)
         let n = Vector.zAxis.cross(h)
         let e: Vector = {
-            let a = r * (pow(v.magnitude, 2) - µ / r.magnitude)
+            let a = r * (pow(v.magnitude, 2) - body.gravitationalParameter / r.magnitude)
             let b = r.dot(v) * v
-            return (a - b) / µ
+            return (a - b) / body.gravitationalParameter
         }()
 
-        semiMajorAxis = 1 / (2 / r.magnitude - pow(v.magnitude, 2) / µ)
+        celestialBody = body
+        semiMajorAxis = 1 / (2 / r.magnitude - pow(v.magnitude, 2) / body.gravitationalParameter)
         eccentricity = e.magnitude
         inclination = acos(h.z / h.magnitude)
         let W = acos(n.x / n.magnitude)
-        longitudeOfAscendingNode = n.y >= 0 ? W : twoπ - W
+        longitudeOfAscendingNode = n.y >= 0 ? W : 2.π - W
         let w = acos(n.dot(e) / n.magnitude / e.magnitude)
-        argumentOfPeriapsis = e.z >= 0 ? w : twoπ - w
+        argumentOfPeriapsis = e.z >= 0 ? w : 2.π - w
         let v = acos(e.dot(r) / e.magnitude / r.magnitude)
         meanAnomaly = Orbit.meanAnomaly(trueAnomaly: v, eccentricity: eccentricity)
-        gravitationalParameter = µ
+    }
+
+    /**
+     Rotates an orbit around to the given true anomaly.
+     - parameter trueAnomaly:
+     - returns: orbit with new mean anomaly
+     */
+    public func orbit(at v: Double) -> Orbit {
+        let M = Orbit.meanAnomaly(trueAnomaly: v, eccentricity: eccentricity)
+        return Orbit(around: celestialBody, eccentricity: eccentricity, semiMajorAxis: semiMajorAxis, inclination: inclination, longitudeOfAscendingNode: longitudeOfAscendingNode, argumentOfPeriapsis: argumentOfPeriapsis, meanAnomaly: M)
+    }
+
+    /**
+     Rotates an orbit for an amount of time.
+     - parameter after: seconds from current position
+     - returns: orbit at new time
+     */
+    public func orbit(after t: Double) -> Orbit {
+        let M = meanAnomaly + meanMotion * t
+        return Orbit(around: celestialBody, eccentricity: eccentricity, semiMajorAxis: semiMajorAxis, inclination: inclination, longitudeOfAscendingNode: longitudeOfAscendingNode, argumentOfPeriapsis: argumentOfPeriapsis, meanAnomaly: M)
     }
 
     // (4.38)
     public func seconds(toMeanAnomaly M: Double) -> NSTimeInterval {
         let M_: Double = {
             if M > meanAnomaly { return M }
-            if twoπ - M > meanAnomaly { return twoπ - M }
-            return twoπ + M
+            if 2.π - M > meanAnomaly { return 2.π - M }
+            return 2.π + M
         }()
         return (M_ - meanAnomaly) / meanMotion
     }
@@ -203,11 +259,11 @@ public struct Orbit {
 
     // (4.89)
     public func SOIRadius(withGravitationalParameter µ: Double) -> Double {
-        return radius * pow(µ / gravitationalParameter, 0.4)
+        return radius * pow(µ / celestialBody.gravitationalParameter, 0.4)
     }
 
     public func secondsToLeaveSOI(ofBodyWithOrbit orbit: Orbit) -> NSTimeInterval? {
-        let rSOI = orbit.SOIRadius(withGravitationalParameter: gravitationalParameter)
+        let rSOI = orbit.SOIRadius(withGravitationalParameter: celestialBody.gravitationalParameter)
         guard let v = trueAnomaly(atRadius: rSOI) else { return nil }
         let M = Orbit.meanAnomaly(trueAnomaly: v, eccentricity: eccentricity)
         return seconds(toMeanAnomaly: M)
