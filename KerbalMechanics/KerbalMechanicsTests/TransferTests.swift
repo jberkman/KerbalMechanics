@@ -37,7 +37,7 @@ private let µSun = 1.327124e20
 private let AU = 149.597870e9
 
 class TransferTests: XCTestCase {
-    
+
     /*
      Using a one-tangent burn, calculate the change in true anomaly and the
      time-of-flight for a transfer from Earth to Mars.  The radius vector of Earth at
@@ -118,6 +118,87 @@ class TransferTests: XCTestCase {
         XCTAssertEqualWithAccuracy(orbit.longitudeOfAscendingNode.degrees, 297.76, accuracy: 0.005)
         XCTAssertEqualWithAccuracy(orbit.argumentOfPeriapsis.degrees, 359.77, accuracy: 0.05)
         XCTAssertEqualWithAccuracy(orbit.trueAnomaly.degrees, 0.226, accuracy: 0.05)
+    }
+
+    /*
+     For the spacecraft in Problems 5.3 and 5.4, calculate the hyperbolic excess
+     velocity at departure, the injection dV, and the zenith angle of the departure
+     asymptote.  Injection occurs from an 200 km parking orbit.  Earth's velocity
+     vector at departure is 25876.6X + 13759.5Y m/s.
+     */
+    func test5_6() {
+        let earth = Vector(x: 0.473265, y: -0.899215, z: 0) * 1.AU
+        let mars = Vector(x: 0.066842, y: 1.561256, z: 0.030948) * 1.AU
+        let transfer = Transfer(around: Sol.instance, fromOrigin: earth, toDestination: mars, duration: 207.0 * 24 * 60 * 60)
+        let planet = Sol.instance.earth
+
+        let vP = Vector(x: 25876.6, y: 13759.5, z: 0)
+        let vS = transfer.departureVelocity
+
+        // (5.33)
+        let vSP = vS - vP
+
+        // (5.35)
+        let r0 = planet.radius + 200_000
+        let v0 = sqrt(pow(vSP.magnitude, 2) + 2 * planet.gravitationalParameter / r0)
+
+        // (5.36)
+        let dV = v0 - sqrt(planet.gravitationalParameter / r0)
+
+        // (5.37)
+        let g = acos(transfer.origin.dot(vSP) / transfer.origin.magnitude / vSP.magnitude)
+
+        XCTAssertEqualWithAccuracy(vSP.magnitude, 3_683.0, accuracy: 0.05)
+        XCTAssertEqualWithAccuracy(v0, 11_608.4, accuracy: 0.5)
+        XCTAssertEqualWithAccuracy(dV, 3_824.1, accuracy: 0.05)
+        XCTAssertEqualWithAccuracy(g.degrees, 87.677, accuracy: 0.005)
+    }
+
+    /*
+     For the spacecraft in Problems 5.3 and 5.4, given a miss distance of +18,500 km
+     at arrival, calculate the hyperbolic excess velocity, impact parameter, and
+     semi-major axis and eccentricity of the hyperbolic approach trajectory.  Mars'
+     velocity vector at intercept is -23307.8X + 3112.0Y + 41.8Z m/s.
+     */
+    func test5_7() {
+        let earth = Vector(x: 0.473265, y: -0.899215, z: 0) * 1.AU
+        let mars = Vector(x: 0.066842, y: 1.561256, z: 0.030948) * 1.AU
+        let transfer = Transfer(around: Sol.instance, fromOrigin: earth, toDestination: mars, duration: 207.0 * 24 * 60 * 60)
+        let planet = Sol.instance.mars
+
+        let vP = Vector(x: -23307.8, y: 3112.0, z: 41.8)
+        let vS = transfer.captureVelocity
+        let d = 18_500_000.0
+
+        // (5.33)
+        let vSP = vS - vP
+
+        // (5.38 a)
+        let d_ = sqrt(mars.x * mars.x + mars.y * mars.y)
+        let dx = -d * mars.y / d_
+
+        // (5.38 b)
+        let dy = d * mars.x / d_
+
+        // (5.39)
+        let theta = acos((dx * vSP.x + dy * vSP.y) / d / vSP.magnitude)
+
+        // (5.40)
+        let b = d * sin(theta)
+
+        // (5.41)
+        let a = planet.gravitationalParameter / pow(vSP.magnitude, 2)
+
+        // (5.42)
+        let e = sqrt(1 + pow(b, 2) / pow(a, 2))
+
+        XCTAssertEqualWithAccuracy(vSP.magnitude, 2_438.2, accuracy: 0.5)
+        XCTAssertEqualWithAccuracy(dx / 1.AU, -0.000_123_551, accuracy: 0.000_000_005)
+        XCTAssertEqualWithAccuracy(dy / 1.AU, 0.000_005_289_6, accuracy: 0.000_000_005)
+        XCTAssertEqualWithAccuracy(theta.degrees, 154.279, accuracy: 5)
+        XCTAssertEqualWithAccuracy(b / 1000, 9_123.6, accuracy: 1.5)
+        XCTAssertEqualWithAccuracy(a / 1000, 7_204.3, accuracy: 1)
+        XCTAssertEqualWithAccuracy(e, 1.613_6, accuracy: 0.000_5)
     }
 
 }
