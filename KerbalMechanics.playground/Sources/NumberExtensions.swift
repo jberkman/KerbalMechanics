@@ -1,13 +1,9 @@
 //
-//  DoubleExtensions.swift
+//  NumberExtensions.swift
 //  KerbalMechanics
 //
 //  Created by jacob berkman on 2016-04-29.
 //  Copyright © 2016 jacob berkman.
-//
-//  Algorithms and equations compiled, edited and written in part by
-//  Robert A. Braeunig, 1997, 2005, 2007, 2008, 2011, 2012, 2013.
-//  http://www.braeunig.us/space/basics.htm
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the “Software”), to
@@ -32,33 +28,45 @@ import Darwin
 
 extension Int {
 
-    var π: Double {
-        return Double(self) * M_PI
+    public var AU: Double {
+        return Double(self).AU
+    }
+
+    public var π: Double {
+        return Double(self).π
+    }
+
+    public var radians: Double {
+        return Double(self).radians
+    }
+
+    public var degrees: Double {
+        return Double(self).degrees
     }
 
 }
 
 extension Double {
 
-    var AU: Double {
+    public var AU: Double {
         return self * 149_597_870_000.0
     }
 
-    var π: Double {
+    public var π: Double {
         return self * M_PI
     }
 
-    var radians: Double {
+    public var degrees: Double {
         return π / 180
     }
 
-    var normalizedRadians: Double {
+    public var normalizedRadians: Double {
         guard self >= 0 else { return (self % 2.π) + 2.π }
         guard self < 2.π else { return self % 2.π }
         return self
     }
 
-    var degrees: Double {
+    public var radians: Double {
         return self * 180 / 1.π
     }
 

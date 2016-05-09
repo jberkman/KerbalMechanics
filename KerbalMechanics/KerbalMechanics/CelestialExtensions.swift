@@ -5,10 +5,6 @@
 //  Created by jacob berkman on 2016-05-04.
 //  Copyright © 2016 jacob berkman.
 //
-//  Algorithms and equations compiled, edited and written in part by
-//  Robert A. Braeunig, 1997, 2005, 2007, 2008, 2011, 2012, 2013.
-//  http://www.braeunig.us/space/basics.htm
-//
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the “Software”), to
 //  deal in the Software without restriction, including without limitation the
@@ -42,7 +38,7 @@ extension Planet {
 
 extension Orbiting {
 
-    func orbit(at t: NSTimeInterval) -> Orbit {
+    public func orbit(at t: NSTimeInterval) -> Orbit {
         return Orbit(elements: orbit, atTime: t)
     }
 

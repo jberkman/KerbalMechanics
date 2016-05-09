@@ -5,12 +5,6 @@
 //  Created by jacob berkman on 2016-05-04.
 //  Copyright © 2016 jacob berkman.
 //
-//  Algorithms and equations compiled, edited and written in part by
-//  Robert A. Braeunig, 1997, 2005, 2007, 2008, 2011, 2012, 2013.
-//  http://www.braeunig.us/space/basics.htm
-//
-//  Some descriptions from https://en.wikipedia.org/wiki/Orbital_elements
-//
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the “Software”), to
 //  deal in the Software without restriction, including without limitation the
@@ -63,12 +57,22 @@ extension OrbitingBody: Moon { }
 
 public class PlanetaryBody: OrbitingBody {
 
-    private let getMoons: () -> [Moon]
-    public private(set) lazy var moons: [Moon] = self.getMoons()
+    private let getMoons: (PlanetaryBody) -> [Moon]
+    public private(set) lazy var moons: [Moon] = self.getMoons(self)
 
-    public init(name: String, gravitationalParameter µ: Double, radius r: Double, orbit: OrbitalElements, moons: () -> [Moon]) {
+    public init(name: String, gravitationalParameter µ: Double, radius r: Double, orbit: OrbitalElements, moons: (PlanetaryBody) -> [Moon]) {
         self.getMoons = moons
         super.init(name: name, gravitationalParameter: µ, radius: r, orbit: orbit)
+    }
+
+    public func createMoon(moon: (name: String, µ: Double, r: Double), elements: ComplexCoefficients) -> Moon {
+        let orbit = OrbitalElements(celestialBody: self, elementCoefficients: elements)
+        return OrbitingBody(name: moon.name, gravitationalParameter: moon.µ, radius: moon.r, orbit: orbit)
+    }
+
+    public func createMoon(moon: (name: String, µ: Double, r: Double), elements: SimpleCoefficients) -> Moon {
+        let orbit = OrbitalElements(celestialBody: self, elementCoefficients: elements)
+        return OrbitingBody(name: moon.name, gravitationalParameter: moon.µ, radius: moon.r, orbit: orbit)
     }
 
 }
@@ -77,12 +81,27 @@ extension PlanetaryBody: Planet { }
 
 public class StellarBody: Body {
 
-    private let getPlanets: () -> [Planet]
-    public private(set) lazy var planets: [Planet] = self.getPlanets()
+    private let getPlanets: (StellarBody) -> [Planet]
+    public private(set) lazy var planets: [Planet] = self.getPlanets(self)
 
-    public init(name: String, gravitationalParameter µ: Double, radius r: Double, planets: () -> [Planet]) {
+    public init(name: String, gravitationalParameter µ: Double, radius r: Double, planets: (StellarBody) -> [Planet]) {
         self.getPlanets = planets
         super.init(name: name, gravitationalParameter: µ, radius: r)
+    }
+
+    public func createPlanet(attributes: (name: String, µ: Double, r: Double), elements: ComplexCoefficients) -> Planet {
+        let orbit = OrbitalElements(celestialBody: self, elementCoefficients: elements)
+        return PlanetaryBody(name: attributes.name, gravitationalParameter: attributes.µ, radius: attributes.r, orbit: orbit) { _ in [] }
+    }
+
+    public func createPlanet<P: CustomPlanet>(elements elements: ComplexCoefficients) -> P {
+        let orbit = OrbitalElements(celestialBody: self, elementCoefficients: elements)
+        return P(orbit: orbit)
+    }
+
+    public func createPlanet<P: CustomPlanet>(elements elements: SimpleCoefficients) -> P {
+        let orbit = OrbitalElements(celestialBody: self, elementCoefficients: elements)
+        return P(orbit: orbit)
     }
 
 }

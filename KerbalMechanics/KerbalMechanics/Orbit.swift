@@ -45,6 +45,17 @@ public struct Orbit {
         return E - e * sin(E)
     }
 
+    public static func meanMotion(semiMajorAxis a: Double, gravitationalParameter µ: Double) -> Double {
+        return sqrt(µ / pow(a, 3))
+    }
+
+    public static func meanAnomaly(semiMajorAxis a: Double, gravitationalParameter µ: Double, time t: Double) -> Double {
+        let n = meanMotion(semiMajorAxis: a, gravitationalParameter: µ)
+        let p = 2.π / n
+        let t2 = t % p
+        return (t2 * n).normalizedRadians
+    }
+
     public static func phi(radius r: Vector, velocity v: Vector) -> Double {
         return acos((r.cross(v) / r.magnitude / v.magnitude).magnitude)
     }
@@ -83,7 +94,7 @@ public struct Orbit {
 
     // (4.39)
     public var meanMotion: Double {
-        return sqrt(celestialBody.gravitationalParameter / pow(semiMajorAxis, 3))
+        return Orbit.meanMotion(semiMajorAxis: semiMajorAxis, gravitationalParameter: celestialBody.gravitationalParameter)
     }
 
     // (4.41)
@@ -128,12 +139,13 @@ public struct Orbit {
 
     // http://www.braeunig.us/space/plntpos.htm#coordinates
     public var position: Vector {
-        let u = trueAnomaly + argumentOfPeriapsis
-        let l_ = cos(inclination) * sin(u) / cos(u)
-        let l = atan(l_) + longitudeOfAscendingNode
-        let lOffset = l_ >= 0 ? 0 : 1.π
+        let u = (trueAnomaly + argumentOfPeriapsis).normalizedRadians
+        let l_W = atan(cos(inclination) * sin(u) / cos(u)).normalizedRadians
+        // "If i < 90º, as for the major planets, (l – W) and u must lie in the
+        // same quadrant."
+        let l = ((l_W > 1.π) == (u > 1.π) ? l_W : l_W + 1.π) + longitudeOfAscendingNode
         let b = asin(sin(u) * sin(inclination))
-        return Vector(longitude: (l + lOffset).normalizedRadians, latitude: b, radius: radius)
+        return Vector(longitude: l.normalizedRadians, latitude: b, radius: radius)
     }
 
     /**
@@ -160,12 +172,19 @@ public struct Orbit {
         longitudeOfAscendingNode = eval(elements.longitudeOfAscendingNode).normalizedRadians
 
         switch elements.meanAnomaly.count {
-        case 0:
+        case 0 where elements.meanLongitude.count > 1:
+            print("L:", eval(elements.meanLongitude).radians, "w:", argumentOfPeriapsis.radians, "W:", longitudeOfAscendingNode.radians)
             meanAnomaly = (eval(elements.meanLongitude) - argumentOfPeriapsis - longitudeOfAscendingNode).normalizedRadians
 
+        case 0:
+            print("L:", eval(elements.meanLongitude).radians, "w:", argumentOfPeriapsis.radians, "W:", longitudeOfAscendingNode.radians)
+            let M0 = (elements.meanLongitude[0] - argumentOfPeriapsis - longitudeOfAscendingNode).normalizedRadians
+            let dM = Orbit.meanAnomaly(semiMajorAxis: semiMajorAxis, gravitationalParameter: celestialBody.gravitationalParameter, time: t)
+            meanAnomaly = (M0 + dM).normalizedRadians
+
         case 1:
-            let n = sqrt(celestialBody.gravitationalParameter / pow(semiMajorAxis, 3))
-            meanAnomaly = (elements.meanAnomaly[0] + t * n).normalizedRadians
+            let dM = Orbit.meanAnomaly(semiMajorAxis: semiMajorAxis, gravitationalParameter: celestialBody.gravitationalParameter, time: t)
+            meanAnomaly = (elements.meanAnomaly[0] + dM).normalizedRadians
 
         default:
             meanAnomaly = eval(elements.meanAnomaly).normalizedRadians
@@ -237,8 +256,8 @@ public struct Orbit {
      - returns: orbit at new time
      */
     public func orbit(after t: Double) -> Orbit {
-        let M = meanAnomaly + meanMotion * t
-        return Orbit(around: celestialBody, eccentricity: eccentricity, semiMajorAxis: semiMajorAxis, inclination: inclination, longitudeOfAscendingNode: longitudeOfAscendingNode, argumentOfPeriapsis: argumentOfPeriapsis, meanAnomaly: M)
+        let dM = Orbit.meanAnomaly(semiMajorAxis: semiMajorAxis, gravitationalParameter: celestialBody.gravitationalParameter, time: t)
+        return Orbit(around: celestialBody, eccentricity: eccentricity, semiMajorAxis: semiMajorAxis, inclination: inclination, longitudeOfAscendingNode: longitudeOfAscendingNode, argumentOfPeriapsis: argumentOfPeriapsis, meanAnomaly: meanAnomaly + dM)
     }
 
     // (4.38)

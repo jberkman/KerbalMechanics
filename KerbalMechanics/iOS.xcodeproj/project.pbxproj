@@ -11,7 +11,7 @@
 		162394EF1CD431A4003304D9 /* KerbalMechanics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 162394E41CD431A4003304D9 /* KerbalMechanics.framework */; };
 		1623953A1CD450F6003304D9 /* Vector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162395391CD450F6003304D9 /* Vector.swift */; };
 		1623953C1CD4511C003304D9 /* VectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1623953B1CD4511C003304D9 /* VectorTests.swift */; };
-		162395491CD47B9E003304D9 /* DoubleExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162395481CD47B9E003304D9 /* DoubleExtensions.swift */; };
+		162395491CD47B9E003304D9 /* NumberExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162395481CD47B9E003304D9 /* NumberExtensions.swift */; };
 		1623954B1CD47BA5003304D9 /* Orbit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1623954A1CD47BA5003304D9 /* Orbit.swift */; };
 /* End PBXBuildFile section */
 
@@ -33,7 +33,7 @@
 		162394F51CD431A4003304D9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		162395391CD450F6003304D9 /* Vector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Vector.swift; sourceTree = "<group>"; };
 		1623953B1CD4511C003304D9 /* VectorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VectorTests.swift; sourceTree = "<group>"; };
-		162395481CD47B9E003304D9 /* DoubleExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DoubleExtensions.swift; sourceTree = "<group>"; };
+		162395481CD47B9E003304D9 /* NumberExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NumberExtensions.swift; sourceTree = "<group>"; };
 		1623954A1CD47BA5003304D9 /* Orbit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Orbit.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -114,7 +114,7 @@
 		162395381CD450B6003304D9 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				162395481CD47B9E003304D9 /* DoubleExtensions.swift */,
+				162395481CD47B9E003304D9 /* NumberExtensions.swift */,
 			);
 			name = Extensions;
 			sourceTree = "<group>";
@@ -227,7 +227,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				162395491CD47B9E003304D9 /* DoubleExtensions.swift in Sources */,
+				162395491CD47B9E003304D9 /* NumberExtensions.swift in Sources */,
 				1623953A1CD450F6003304D9 /* Vector.swift in Sources */,
 				1623954B1CD47BA5003304D9 /* Orbit.swift in Sources */,
 			);
@@ -420,6 +420,7 @@
 				162394FA1CD431A4003304D9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		162394FB1CD431A4003304D9 /* Build configuration list for PBXNativeTarget "KerbalMechanicsTests" */ = {
 			isa = XCConfigurationList;
@@ -428,6 +429,7 @@
 				162394FD1CD431A4003304D9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

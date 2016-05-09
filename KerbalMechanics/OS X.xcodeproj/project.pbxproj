@@ -19,10 +19,11 @@
 		162395411CD45180003304D9 /* Vector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162395401CD45180003304D9 /* Vector.swift */; };
 		162395431CD4518D003304D9 /* VectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162395421CD4518D003304D9 /* VectorTests.swift */; };
 		162395451CD4788C003304D9 /* Orbit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162395441CD4788B003304D9 /* Orbit.swift */; };
-		162395471CD47B44003304D9 /* DoubleExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162395461CD47B44003304D9 /* DoubleExtensions.swift */; };
+		162395471CD47B44003304D9 /* NumberExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162395461CD47B44003304D9 /* NumberExtensions.swift */; };
 		1623954D1CD480AE003304D9 /* OrbitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1623954C1CD480AE003304D9 /* OrbitTests.swift */; };
 		166E96641CDC6BB50095C00C /* TimeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 166E96631CDC6BB50095C00C /* TimeTests.swift */; };
 		166E96651CDC788A0095C00C /* TransferTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1615C8861CD5C4C80094B1AC /* TransferTests.swift */; };
+		166E96671CDEB2400095C00C /* Kerbol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 166E96661CDEB2400095C00C /* Kerbol.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -52,9 +53,10 @@
 		162395401CD45180003304D9 /* Vector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Vector.swift; sourceTree = "<group>"; };
 		162395421CD4518D003304D9 /* VectorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VectorTests.swift; sourceTree = "<group>"; };
 		162395441CD4788B003304D9 /* Orbit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Orbit.swift; sourceTree = "<group>"; };
-		162395461CD47B44003304D9 /* DoubleExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DoubleExtensions.swift; sourceTree = "<group>"; };
+		162395461CD47B44003304D9 /* NumberExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NumberExtensions.swift; sourceTree = "<group>"; };
 		1623954C1CD480AE003304D9 /* OrbitTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OrbitTests.swift; sourceTree = "<group>"; };
 		166E96631CDC6BB50095C00C /* TimeTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeTests.swift; sourceTree = "<group>"; };
+		166E96661CDEB2400095C00C /* Kerbol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Kerbol.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -122,7 +124,7 @@
 			isa = PBXGroup;
 			children = (
 				1615C8921CDA58C20094B1AC /* CelestialExtensions.swift */,
-				162395461CD47B44003304D9 /* DoubleExtensions.swift */,
+				162395461CD47B44003304D9 /* NumberExtensions.swift */,
 				1615C89A1CDB9DC90094B1AC /* TimeExtensions.swift */,
 			);
 			name = Extensions;
@@ -140,6 +142,7 @@
 			isa = PBXGroup;
 			children = (
 				1615C8961CDAF0BC0094B1AC /* Bodies.swift */,
+				166E96661CDEB2400095C00C /* Kerbol.swift */,
 				162395441CD4788B003304D9 /* Orbit.swift */,
 				1615C8821CD5549E0094B1AC /* OrbitalElements.swift */,
 				1615C8941CDAED3D0094B1AC /* Sol.swift */,
@@ -262,8 +265,9 @@
 				1615C8991CDB0B4F0094B1AC /* CelestialProtocols.swift in Sources */,
 				1615C8931CDA58C20094B1AC /* CelestialExtensions.swift in Sources */,
 				1615C8851CD5864B0094B1AC /* Transfer.swift in Sources */,
-				162395471CD47B44003304D9 /* DoubleExtensions.swift in Sources */,
+				162395471CD47B44003304D9 /* NumberExtensions.swift in Sources */,
 				1615C8831CD5549E0094B1AC /* OrbitalElements.swift in Sources */,
+				166E96671CDEB2400095C00C /* Kerbol.swift in Sources */,
 				162395411CD45180003304D9 /* Vector.swift in Sources */,
 				1615C89B1CDB9DC90094B1AC /* TimeExtensions.swift in Sources */,
 				1615C8951CDAED3D0094B1AC /* Sol.swift in Sources */,

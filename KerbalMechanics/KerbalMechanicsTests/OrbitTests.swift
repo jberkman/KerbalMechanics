@@ -41,8 +41,8 @@ class OrbitTests: XCTestCase {
      */
     func test4_13() {
         let elements = OrbitalElements(celestialBody: Sol.instance.earth, a: 7_500_000, e: 0.1)
-        let orbit30 = Orbit(elements: elements, atTime: 0).orbit(at: 30.radians)
-        let orbit90 = orbit30.orbit(at: 90.radians)
+        let orbit30 = Orbit(elements: elements, atTime: 0).orbit(at: 30.degrees)
+        let orbit90 = orbit30.orbit(at: 90.degrees)
         let t = orbit30.seconds(toMeanAnomaly: orbit90.meanAnomaly)
         XCTAssertEqualWithAccuracy(t, 968.4, accuracy: 0.05)
     }
@@ -53,9 +53,9 @@ class OrbitTests: XCTestCase {
      */
     func test4_14() {
         let elements = OrbitalElements(celestialBody: Sol.instance.earth, a: 7_500_000, e: 0.1)
-        let orbit = Orbit(elements: elements, atTime: 0).orbit(at: 90.radians).orbit(after: 20 * 60)
+        let orbit = Orbit(elements: elements, atTime: 0).orbit(at: 90.degrees).orbit(after: 20 * 60)
         let v = orbit.trueAnomaly
-        XCTAssertEqualWithAccuracy(v.degrees, 151.3, accuracy: 0.05)
+        XCTAssertEqualWithAccuracy(v.radians, 151.3, accuracy: 0.05)
     }
 
     /*
@@ -65,9 +65,9 @@ class OrbitTests: XCTestCase {
      */
     func test4_15() {
         let elements = OrbitalElements(celestialBody: Sol.instance.earth, a: 7_500_000, e: 0.1)
-        let orbit = Orbit(elements: elements, atTime: 0).orbit(at: 225.radians)
+        let orbit = Orbit(elements: elements, atTime: 0).orbit(at: 225.degrees)
         XCTAssertEqualWithAccuracy(orbit.radius, 7_989_977, accuracy: 0.5)
-        XCTAssertEqualWithAccuracy(orbit.azimuth.degrees, -4.351, accuracy: 0.0005)
+        XCTAssertEqualWithAccuracy(orbit.azimuth.radians, -4.351, accuracy: 0.0005)
         XCTAssertEqualWithAccuracy(orbit.velocity, 6_828, accuracy: 0.5)
     }
 
@@ -78,12 +78,12 @@ class OrbitTests: XCTestCase {
      */
     func testOrbitOfMars() {
         let orbit = Sol.instance.mars.orbit(at: 2442980.0 * 24 * 60 * 60)
-        XCTAssertEqualWithAccuracy(orbit.longitudeOfAscendingNode.degrees, 49.376635, accuracy: 0.000005)
+        XCTAssertEqualWithAccuracy(orbit.longitudeOfAscendingNode.radians, 49.376635, accuracy: 0.000005)
         XCTAssertEqualWithAccuracy(orbit.semiMajorAxis / 1.AU, 1.5236883, accuracy: 0.00000005)
         XCTAssertEqualWithAccuracy(orbit.eccentricity, 0.093383330, accuracy: 0.0000000005)
-        XCTAssertEqualWithAccuracy(orbit.inclination.degrees, 1.849824, accuracy: 0.005)
-        XCTAssertEqualWithAccuracy(orbit.argumentOfPeriapsis.degrees, 286.250750, accuracy: 0.0000005)
-        XCTAssertEqualWithAccuracy(orbit.meanAnomaly.degrees, 211.137002, accuracy: 0.000005)
+        XCTAssertEqualWithAccuracy(orbit.inclination.radians, 1.849824, accuracy: 0.005)
+        XCTAssertEqualWithAccuracy(orbit.argumentOfPeriapsis.radians, 286.250750, accuracy: 0.0000005)
+        XCTAssertEqualWithAccuracy(orbit.meanAnomaly.radians, 211.137002, accuracy: 0.000005)
     }
 
     /*
@@ -91,12 +91,12 @@ class OrbitTests: XCTestCase {
      */
     func testOrbitOfEarth() {
         let orbit = Sol.instance.earth.orbit(at: 2442980.0 * 24 * 60 * 60)
-        XCTAssertEqual(orbit.longitudeOfAscendingNode.degrees, 0)
+        XCTAssertEqual(orbit.longitudeOfAscendingNode.radians, 0)
         XCTAssertEqualWithAccuracy(orbit.semiMajorAxis / 1.AU, 1.0000002, accuracy: 0.00005)
         XCTAssertEqualWithAccuracy(orbit.eccentricity, 0.016718968, accuracy: 0.0000000005)
         XCTAssertEqual(orbit.inclination, 0)
         XCTAssertEqual(orbit.argumentOfPeriapsis, 0)
-        XCTAssertEqualWithAccuracy(orbit.meanAnomaly.degrees, 195.859204, accuracy: 0.000005)
+        XCTAssertEqualWithAccuracy(orbit.meanAnomaly.radians, 195.859204, accuracy: 0.000005)
     }
 
     /*
@@ -105,8 +105,8 @@ class OrbitTests: XCTestCase {
     func testHelioEclipticMars() {
         let orbit = Sol.instance.mars.orbit(at: 2442980.0 * 24 * 60 * 60)
         let position = orbit.position
-        XCTAssertEqualWithAccuracy(position.longitude.degrees, 181.756494, accuracy: 0.00005)
-        XCTAssertEqualWithAccuracy(position.latitude.degrees, 1.366666, accuracy: 0.005)
+        XCTAssertEqualWithAccuracy(position.longitude.radians, 181.756494, accuracy: 0.00005)
+        XCTAssertEqualWithAccuracy(position.latitude.radians, 1.366666, accuracy: 0.005)
         XCTAssertEqualWithAccuracy(position.radius / 1.AU, 1.648641, accuracy: 0.0000005)
     }
 

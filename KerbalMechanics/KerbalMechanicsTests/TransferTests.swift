@@ -55,7 +55,7 @@ class TransferTests: XCTestCase {
         let orbit = Orbit(elements: elements, atTime: 0)
         let M = Orbit.meanAnomaly(trueAnomaly: v, eccentricity: e)
         let t = orbit.seconds(toMeanAnomaly: M)
-        XCTAssertEqualWithAccuracy(v.degrees, 146.488, accuracy: 0.0005)
+        XCTAssertEqualWithAccuracy(v.radians, 146.488, accuracy: 0.0005)
         XCTAssertEqualWithAccuracy(t / 24 / 60 / 60, 194.77, accuracy: 0.05)
     }
 
@@ -114,10 +114,10 @@ class TransferTests: XCTestCase {
         let orbit = Orbit(around: Sol.instance, position: transfer.origin, velocity: transfer.departureVelocity)
         XCTAssertEqualWithAccuracy(orbit.semiMajorAxis, 1.97614e11, accuracy: 5e6)
         XCTAssertEqualWithAccuracy(orbit.eccentricity, 0.230751, accuracy: 0.000005)
-        XCTAssertEqualWithAccuracy(orbit.inclination.degrees, 2.255, accuracy: 0.005)
-        XCTAssertEqualWithAccuracy(orbit.longitudeOfAscendingNode.degrees, 297.76, accuracy: 0.005)
-        XCTAssertEqualWithAccuracy(orbit.argumentOfPeriapsis.degrees, 359.77, accuracy: 0.05)
-        XCTAssertEqualWithAccuracy(orbit.trueAnomaly.degrees, 0.226, accuracy: 0.05)
+        XCTAssertEqualWithAccuracy(orbit.inclination.radians, 2.255, accuracy: 0.005)
+        XCTAssertEqualWithAccuracy(orbit.longitudeOfAscendingNode.radians, 297.76, accuracy: 0.005)
+        XCTAssertEqualWithAccuracy(orbit.argumentOfPeriapsis.radians, 359.77, accuracy: 0.05)
+        XCTAssertEqualWithAccuracy(orbit.trueAnomaly.radians, 0.226, accuracy: 0.05)
     }
 
     /*
@@ -151,7 +151,7 @@ class TransferTests: XCTestCase {
         XCTAssertEqualWithAccuracy(vSP.magnitude, 3_683.0, accuracy: 0.05)
         XCTAssertEqualWithAccuracy(v0, 11_608.4, accuracy: 0.5)
         XCTAssertEqualWithAccuracy(dV, 3_824.1, accuracy: 0.05)
-        XCTAssertEqualWithAccuracy(g.degrees, 87.677, accuracy: 0.005)
+        XCTAssertEqualWithAccuracy(g.radians, 87.677, accuracy: 0.005)
     }
 
     /*
@@ -195,7 +195,7 @@ class TransferTests: XCTestCase {
         XCTAssertEqualWithAccuracy(vSP.magnitude, 2_438.2, accuracy: 0.5)
         XCTAssertEqualWithAccuracy(dx / 1.AU, -0.000_123_551, accuracy: 0.000_000_005)
         XCTAssertEqualWithAccuracy(dy / 1.AU, 0.000_005_289_6, accuracy: 0.000_000_005)
-        XCTAssertEqualWithAccuracy(theta.degrees, 154.279, accuracy: 5)
+        XCTAssertEqualWithAccuracy(theta.radians, 154.279, accuracy: 5)
         XCTAssertEqualWithAccuracy(b / 1000, 9_123.6, accuracy: 1.5)
         XCTAssertEqualWithAccuracy(a / 1000, 7_204.3, accuracy: 1)
         XCTAssertEqualWithAccuracy(e, 1.613_6, accuracy: 0.000_5)

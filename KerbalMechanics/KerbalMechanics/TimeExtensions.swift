@@ -52,7 +52,7 @@ extension NSDateComponents {
 
     func definedValue(value: Int, defaultValue: Double = 0) -> Double {
         guard value != NSDateComponentUndefined else { return defaultValue }
-        return Double(value)
+        return Double(value) - defaultValue
     }
 
     public var julianTimeInterval: NSTimeInterval {
@@ -83,8 +83,8 @@ extension NSDateComponents {
     }
 
     public var timeIntervalSinceKerbinEpoch: NSTimeInterval {
-        let y = (definedValue(year, defaultValue: 1) - 1) * secondsPerKerbinYear
-        let d = (definedValue(day,  defaultValue: 1) - 1) * secondsPerKerbinDay
+        let y = definedValue(year, defaultValue: 1) * secondsPerKerbinYear
+        let d = definedValue(day,  defaultValue: 1) * secondsPerKerbinDay
         let h = definedValue(hour) * secondsPerHour
         let m = definedValue(minute) * secondsPerMinute
         let s = definedValue(second)
@@ -108,7 +108,7 @@ extension NSTimeInterval {
         let comps = NSDateComponents()
         comps.year = Int(self / secondsPerKerbinYear) + 1
         comps.day = Int((self % secondsPerKerbinYear) / secondsPerKerbinDay) + 1
-        comps.hour = Int((self % secondsPerKerbinDay) / secondsPerHour)
+        comps.hour = Int((self % secondsPerKerbinDay) / secondsPerHour) + 1
         comps.minute = Int((self % secondsPerHour) / secondsPerMinute)
         comps.second = Int(self % secondsPerMinute)
         comps.nanosecond = Int((self % 1) / secondsPerNanosecond)
