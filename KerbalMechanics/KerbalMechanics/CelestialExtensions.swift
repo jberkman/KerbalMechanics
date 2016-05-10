@@ -42,4 +42,8 @@ extension Orbiting {
         return Orbit(elements: orbit, atTime: t)
     }
 
+    public func velocity(at t: NSTimeInterval) -> Vector {
+        return orbit(at: t + 0.5).position.cartesian - orbit(at: t - 0.5).position.cartesian
+    }
+
 }

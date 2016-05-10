@@ -125,8 +125,15 @@ public struct Orbit {
     }
 
     // (4.45)
-    public var velocity: Double {
+    public var velocityMagnitude: Double {
         return sqrt(celestialBody.gravitationalParameter * (2 / radius - 1 / semiMajorAxis))
+    }
+
+    // Easy, but probably inaccurate and slow.
+    // See http://www.orbiter-forum.com/showthread.php?t=24457 for another idea
+    // but we'd need to determine h vector.
+    public var velocity: Vector {
+        return orbit(after: 0.5).position.cartesian - orbit(after: -0.5).position.cartesian
     }
 
     // http://www.braeunig.us/space/plntpos.htm#coordinates

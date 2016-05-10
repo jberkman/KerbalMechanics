@@ -86,7 +86,9 @@ public extension Vector {
     public var z: Double { return c }
 
     public init(x: Double, y: Double, z: Double) {
-        self.init(a: x, b: y, c: z)
+        a = x
+        b = y
+        c = z
     }
 
     public var polar: Vector {
@@ -105,7 +107,9 @@ public extension Vector {
     public var radius: Double { return c }
 
     public init(longitude: Double, latitude: Double, radius: Double) {
-        self.init(a: longitude, b: latitude, c: radius)
+        a = longitude
+        b = latitude
+        c = radius
     }
 
     public var cartesian: Vector {
