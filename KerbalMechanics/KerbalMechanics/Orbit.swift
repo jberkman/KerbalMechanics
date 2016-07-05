@@ -34,15 +34,21 @@ import Darwin
 
 public struct Orbit {
 
-    public static func meanAnomaly(trueAnomaly v: Double, eccentricity e: Double) -> Double {
-        // (4.40)
-        let a = e + cos(v)
-        let b = 1 + e * cos(v)
-        let E_ = acos(a / b)
-        let E = v > 1.π ? 2.π - E_ : E_
+    public static func trueAnomaly(meanAnomaly M: Double, eccentricity e: Double) -> Double {
+        func iter(x: Double) -> Double {
+            let fx = e * sin(x) - x + M
+            let f_x = e * cos(x) - 1
+            let x_ = x - fx / f_x
+            guard abs(x - x_) > 0.0001 else { return x_ }
+            return iter(x_)
+        }
+        let E = iter(0)
 
-        // (4.41)
-        return E - e * sin(E)
+        // http://www.braeunig.us/space/plntpos.htm#coordinates
+        let a = sqrt((1 + e) / (1 - e))
+        let b = tan(E / 2)
+        let c = 2 * atan(a * b)
+        return c.normalizedRadians
     }
 
     public static func meanMotion(semiMajorAxis a: Double, gravitationalParameter µ: Double) -> Double {
@@ -80,7 +86,7 @@ public struct Orbit {
     public let argumentOfPeriapsis: Double
 
     /// the position of the orbiting body along the ellipse at a specific time
-    public let meanAnomaly: Double
+    public let trueAnomaly: Double
 
     // (4.21)
     public var periapsis: Double {
@@ -97,16 +103,28 @@ public struct Orbit {
         return Orbit.meanMotion(semiMajorAxis: semiMajorAxis, gravitationalParameter: celestialBody.gravitationalParameter)
     }
 
-    // (4.41)
+    // (4.40)
     public var eccentricAnomaly: Double {
-        func iter(x: Double) -> Double {
-            let fx = eccentricity * sin(x) - x + meanAnomaly
-            let f_x = eccentricity * cos(x) - 1
-            let x_ = x - fx / f_x
-            guard abs(x - x_) > 0.0001 else { return x_ }
-            return iter(x_)
-        }
-        return iter(0)
+        let cosv = cos(trueAnomaly)
+        let a = eccentricity + cosv
+        let b = 1 + eccentricity * cosv
+        let E = acos(a / b)
+        return trueAnomaly > 1.π ? 2.π - E : E
+    }
+
+    // (4.87)
+    public var hyperbolicEccentricAnomaly: Double {
+        let cosv = cos(trueAnomaly)
+        let a = eccentricity + cosv
+        let b = 1 + eccentricity * cosv
+        let F = acosh(abs(a / b))
+        return trueAnomaly >= 0 ? F : -F
+    }
+
+    // (4.41)
+    public var meanAnomaly: Double {
+        let E = eccentricAnomaly
+        return E - eccentricity * sin(E)
     }
 
     // (4.43)
@@ -133,15 +151,19 @@ public struct Orbit {
     // See http://www.orbiter-forum.com/showthread.php?t=24457 for another idea
     // but we'd need to determine h vector.
     public var velocity: Vector {
-        return orbit(after: 0.5).position.cartesian - orbit(after: -0.5).position.cartesian
-    }
-
-    // http://www.braeunig.us/space/plntpos.htm#coordinates
-    public var trueAnomaly: Double {
-        let a = sqrt((1 + eccentricity) / (1 - eccentricity))
-        let b = tan(eccentricAnomaly / 2)
-        let c = 2 * atan(a * b)
-        return c.normalizedRadians
+        if eccentricity < 1 {
+            return orbit(after: 0.5).position.cartesian - orbit(after: -0.5).position.cartesian
+        }
+        func iter(dv: Double) -> Vector {
+            let s = abs(seconds(toTrueAnomaly: trueAnomaly + dv))
+            guard s > 1 else {
+                let orbit1 = orbit(at: trueAnomaly - dv)
+                let orbit2 = orbit(at: trueAnomaly + dv)
+                return (orbit2.position.cartesian - orbit1.position.cartesian) / orbit1.seconds(toTrueAnomaly: orbit2.trueAnomaly)
+            }
+            return iter(dv / s / 2)
+        }
+        return iter(0.1)
     }
 
     // http://www.braeunig.us/space/plntpos.htm#coordinates
@@ -163,7 +185,7 @@ public struct Orbit {
          - elements: Orbital elements defining this orbit
          - t: Time interval from epoch (Julian or Kerbal)
      */
-    public init(elements: OrbitalElements, atTime t: NSTimeInterval) {
+    public init(elements: OrbitalElements, atTime t: Double) {
         let julianCenturies = t.julianCenturies
         let timeTerms = (0 ..< elements.maxLength).map { pow(julianCenturies, Double($0)) }
 
@@ -181,20 +203,24 @@ public struct Orbit {
         switch elements.meanAnomaly.count {
         case 0 where elements.meanLongitude.count > 1:
             print("L:", eval(elements.meanLongitude).radians, "w:", argumentOfPeriapsis.radians, "W:", longitudeOfAscendingNode.radians)
-            meanAnomaly = (eval(elements.meanLongitude) - argumentOfPeriapsis - longitudeOfAscendingNode).normalizedRadians
+            let M = (eval(elements.meanLongitude) - argumentOfPeriapsis - longitudeOfAscendingNode).normalizedRadians
+            trueAnomaly = Orbit.trueAnomaly(meanAnomaly: M, eccentricity: eccentricity)
 
         case 0:
             print("L:", eval(elements.meanLongitude).radians, "w:", argumentOfPeriapsis.radians, "W:", longitudeOfAscendingNode.radians)
             let M0 = (elements.meanLongitude[0] - argumentOfPeriapsis - longitudeOfAscendingNode).normalizedRadians
             let dM = Orbit.meanAnomaly(semiMajorAxis: semiMajorAxis, gravitationalParameter: celestialBody.gravitationalParameter, time: t)
-            meanAnomaly = (M0 + dM).normalizedRadians
+            let M = (M0 + dM).normalizedRadians
+            trueAnomaly = Orbit.trueAnomaly(meanAnomaly: M, eccentricity: eccentricity)
 
         case 1:
             let dM = Orbit.meanAnomaly(semiMajorAxis: semiMajorAxis, gravitationalParameter: celestialBody.gravitationalParameter, time: t)
-            meanAnomaly = (elements.meanAnomaly[0] + dM).normalizedRadians
+            let M = (elements.meanAnomaly[0] + dM).normalizedRadians
+            trueAnomaly = Orbit.trueAnomaly(meanAnomaly: M, eccentricity: eccentricity)
 
         default:
-            meanAnomaly = eval(elements.meanAnomaly).normalizedRadians
+            let M = eval(elements.meanAnomaly).normalizedRadians
+            trueAnomaly = Orbit.trueAnomaly(meanAnomaly: M, eccentricity: eccentricity)
         }
     }
     
@@ -207,7 +233,6 @@ public struct Orbit {
          - longitudeOfAscendingNode:
          - argumentOrPeriapsis:
          - meanAnomaly:
-         - gravitationarlParameter:
      */
     public init(around body: CelestialBody, eccentricity e: Double, semiMajorAxis a: Double, inclination i: Double, longitudeOfAscendingNode W: Double, argumentOfPeriapsis w: Double, meanAnomaly M: Double) {
         celestialBody = body
@@ -216,7 +241,48 @@ public struct Orbit {
         inclination = i
         longitudeOfAscendingNode = W
         argumentOfPeriapsis = w
-        meanAnomaly = M
+        trueAnomaly = Orbit.trueAnomaly(meanAnomaly: M, eccentricity: eccentricity)
+    }
+
+    /**
+     Standard constructor accepting explicitly defined elements.
+     - parameters:
+         - eccentricity:
+         - semiMajorAxis:
+         - inclination:
+         - longitudeOfAscendingNode:
+         - argumentOrPeriapsis:
+         - trueAnomaly:
+     */
+    public init(around body: CelestialBody, eccentricity e: Double, semiMajorAxis a: Double, inclination i: Double, longitudeOfAscendingNode W: Double, argumentOfPeriapsis w: Double, trueAnomaly v: Double) {
+        celestialBody = body
+        eccentricity = e
+        semiMajorAxis = a
+        inclination = i
+        longitudeOfAscendingNode = W
+        argumentOfPeriapsis = w
+        trueAnomaly = v
+    }
+
+    /**
+     Simple constructor accepting explicitly defined elements.
+     - parameters:
+         - eccentricity:
+         - semiMajorAxis:
+         - inclination:
+         - longitudeOfAscendingNode:
+         - argumentOrPeriapsis:
+         - meanAnomaly:
+         - gravitationarlParameter:
+     */
+    public init(around body: CelestialBody, altitude: Double) {
+        celestialBody = body
+        eccentricity = 0
+        semiMajorAxis = body.radius + altitude
+        inclination = 0
+        longitudeOfAscendingNode = 0
+        argumentOfPeriapsis = 0
+        trueAnomaly = 0
     }
 
     /**
@@ -240,11 +306,10 @@ public struct Orbit {
         eccentricity = e.magnitude
         inclination = acos(h.z / h.magnitude)
         let W = acos(n.x / n.magnitude)
-        longitudeOfAscendingNode = n.y >= 0 ? W : 2.π - W
+        longitudeOfAscendingNode = W.isNaN ? 0 : n.y >= 0 ? W : 2.π - W
         let w = acos(n.dot(e) / n.magnitude / e.magnitude)
-        argumentOfPeriapsis = e.z >= 0 ? w : 2.π - w
-        let v = acos(e.dot(r) / e.magnitude / r.magnitude)
-        meanAnomaly = Orbit.meanAnomaly(trueAnomaly: v, eccentricity: eccentricity)
+        argumentOfPeriapsis = w.isNaN ? 0 : e.z >= 0 ? w : 2.π - w
+        trueAnomaly = acos(e.dot(r) / e.magnitude / r.magnitude)
     }
 
     /**
@@ -253,8 +318,7 @@ public struct Orbit {
      - returns: orbit with new mean anomaly
      */
     public func orbit(at v: Double) -> Orbit {
-        let M = Orbit.meanAnomaly(trueAnomaly: v, eccentricity: eccentricity)
-        return Orbit(around: celestialBody, eccentricity: eccentricity, semiMajorAxis: semiMajorAxis, inclination: inclination, longitudeOfAscendingNode: longitudeOfAscendingNode, argumentOfPeriapsis: argumentOfPeriapsis, meanAnomaly: M)
+        return Orbit(around: celestialBody, eccentricity: eccentricity, semiMajorAxis: semiMajorAxis, inclination: inclination, longitudeOfAscendingNode: longitudeOfAscendingNode, argumentOfPeriapsis: argumentOfPeriapsis, trueAnomaly: v)
     }
 
     /**
@@ -267,8 +331,17 @@ public struct Orbit {
         return Orbit(around: celestialBody, eccentricity: eccentricity, semiMajorAxis: semiMajorAxis, inclination: inclination, longitudeOfAscendingNode: longitudeOfAscendingNode, argumentOfPeriapsis: argumentOfPeriapsis, meanAnomaly: meanAnomaly + dM)
     }
 
+    /**
+     Rotates an orbit along its ascending node.
+         - parameter inclination: new inclination
+     - returns: orbit with new inclination
+     */
+    public func orbit(inclination i: Double) -> Orbit {
+        return Orbit(around: celestialBody, eccentricity: eccentricity, semiMajorAxis: semiMajorAxis, inclination: i, longitudeOfAscendingNode: longitudeOfAscendingNode, argumentOfPeriapsis: argumentOfPeriapsis, trueAnomaly: trueAnomaly)
+    }
+
     // (4.38)
-    public func seconds(toMeanAnomaly M: Double) -> NSTimeInterval {
+    public func seconds(toMeanAnomaly M: Double) -> Double {
         let M_: Double = {
             if M > meanAnomaly { return M }
             if 2.π - M > meanAnomaly { return 2.π - M }
@@ -283,16 +356,31 @@ public struct Orbit {
         return acos((semiMajorAxis * (1 - eccentricity * eccentricity) / r - 1) / eccentricity)
     }
 
+    // (4.86)
+    public func seconds(toTrueAnomaly v: Double) -> Double {
+        let orbit = self.orbit(at: v)
+        guard eccentricity > 1 else {
+            return (orbit.meanAnomaly - meanAnomaly).normalizedRadians / meanMotion
+        }
+        let F = orbit.hyperbolicEccentricAnomaly
+        let F0 = hyperbolicEccentricAnomaly
+        let a = eccentricity * sinh(F) - F
+        let b = eccentricity * sinh(F0) - F0
+        let c = sqrt(pow(-semiMajorAxis, 3) / celestialBody.gravitationalParameter)
+        return (a - b) * c
+    }
+
     // (4.89)
     public func SOIRadius(withGravitationalParameter µ: Double) -> Double {
         return radius * pow(µ / celestialBody.gravitationalParameter, 0.4)
     }
 
-    public func secondsToLeaveSOI(ofBodyWithOrbit orbit: Orbit) -> NSTimeInterval? {
-        let rSOI = orbit.SOIRadius(withGravitationalParameter: celestialBody.gravitationalParameter)
-        guard let v = trueAnomaly(atRadius: rSOI) else { return nil }
-        let M = Orbit.meanAnomaly(trueAnomaly: v, eccentricity: eccentricity)
-        return seconds(toMeanAnomaly: M)
+}
+
+extension Orbit: CustomStringConvertible {
+    /// A textual representation of `self`.
+    public var description: String {
+        return "(e: \(eccentricity), a: \(semiMajorAxis), i: \(inclination), w: \(argumentOfPeriapsis), W: \(longitudeOfAscendingNode), v: \(trueAnomaly))"
     }
 
 }

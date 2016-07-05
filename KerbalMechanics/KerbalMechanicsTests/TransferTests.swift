@@ -53,8 +53,7 @@ class TransferTests: XCTestCase {
         let v = acos((aTX * (1 - e * e) / rB - 1) / e)
         let elements = OrbitalElements(celestialBody: Sol.instance, a: aTX, e: e)
         let orbit = Orbit(elements: elements, atTime: 0)
-        let M = Orbit.meanAnomaly(trueAnomaly: v, eccentricity: e)
-        let t = orbit.seconds(toMeanAnomaly: M)
+        let t = orbit.seconds(toTrueAnomaly: v)
         XCTAssertEqualWithAccuracy(v.radians, 146.488, accuracy: 0.0005)
         XCTAssertEqualWithAccuracy(t / 24 / 60 / 60, 194.77, accuracy: 0.05)
     }

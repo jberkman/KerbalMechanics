@@ -24,8 +24,6 @@
 //  IN THE SOFTWARE.
 //
 
-import Foundation
-
 // Source: http://pastebin.com/LYLKEJuw
 private let bodies = (
     kerbol: (name: "Sun",    µ: 1.172_332_794_832_49e18,        r: 261_600_000.0),

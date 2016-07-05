@@ -38,11 +38,11 @@ extension Planet {
 
 extension Orbiting {
 
-    public func orbit(at t: NSTimeInterval) -> Orbit {
+    public func orbit(at t: Double) -> Orbit {
         return Orbit(elements: orbit, atTime: t)
     }
 
-    public func velocity(at t: NSTimeInterval) -> Vector {
+    public func velocity(at t: Double) -> Vector {
         return orbit(at: t + 0.5).position.cartesian - orbit(at: t - 0.5).position.cartesian
     }
 

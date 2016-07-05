@@ -55,7 +55,7 @@ extension NSDateComponents {
         return Double(value) - defaultValue
     }
 
-    public var julianTimeInterval: NSTimeInterval {
+    public var julianTimeInterval: Double {
         assert(year != NSDateComponentUndefined)
         assert(month != NSDateComponentUndefined)
         assert(day != NSDateComponentUndefined)
@@ -82,7 +82,7 @@ extension NSDateComponents {
         return (y2 + m2 + d2 + 1720994.5 + Double(b)) * secondsPerDay
     }
 
-    public var timeIntervalSinceKerbinEpoch: NSTimeInterval {
+    public var timeIntervalSinceKerbinEpoch: Double {
         let y = definedValue(year, defaultValue: 1) * secondsPerKerbinYear
         let d = definedValue(day,  defaultValue: 1) * secondsPerKerbinDay
         let h = definedValue(hour) * secondsPerHour
@@ -94,7 +94,7 @@ extension NSDateComponents {
 
 }
 
-extension NSTimeInterval {
+extension Double {
 
     public var julianCenturies: Double {
         return (self / secondsPerDay - 2415020.0) / 36525

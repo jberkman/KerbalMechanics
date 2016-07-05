@@ -21,6 +21,8 @@
 		162395451CD4788C003304D9 /* Orbit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162395441CD4788B003304D9 /* Orbit.swift */; };
 		162395471CD47B44003304D9 /* NumberExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162395461CD47B44003304D9 /* NumberExtensions.swift */; };
 		1623954D1CD480AE003304D9 /* OrbitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1623954C1CD480AE003304D9 /* OrbitTests.swift */; };
+		166350821CE0D4260060E5AC /* Quaternion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 166350811CE0D4260060E5AC /* Quaternion.swift */; };
+		166350841CE5861A0060E5AC /* Rocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 166350831CE5861A0060E5AC /* Rocket.swift */; };
 		166E96641CDC6BB50095C00C /* TimeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 166E96631CDC6BB50095C00C /* TimeTests.swift */; };
 		166E96651CDC788A0095C00C /* TransferTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1615C8861CD5C4C80094B1AC /* TransferTests.swift */; };
 		166E96671CDEB2400095C00C /* Kerbol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 166E96661CDEB2400095C00C /* Kerbol.swift */; };
@@ -55,6 +57,8 @@
 		162395441CD4788B003304D9 /* Orbit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Orbit.swift; sourceTree = "<group>"; };
 		162395461CD47B44003304D9 /* NumberExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NumberExtensions.swift; sourceTree = "<group>"; };
 		1623954C1CD480AE003304D9 /* OrbitTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OrbitTests.swift; sourceTree = "<group>"; };
+		166350811CE0D4260060E5AC /* Quaternion.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Quaternion.swift; sourceTree = "<group>"; };
+		166350831CE5861A0060E5AC /* Rocket.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Rocket.swift; sourceTree = "<group>"; };
 		166E96631CDC6BB50095C00C /* TimeTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeTests.swift; sourceTree = "<group>"; };
 		166E96661CDEB2400095C00C /* Kerbol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Kerbol.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -145,6 +149,8 @@
 				166E96661CDEB2400095C00C /* Kerbol.swift */,
 				162395441CD4788B003304D9 /* Orbit.swift */,
 				1615C8821CD5549E0094B1AC /* OrbitalElements.swift */,
+				166350811CE0D4260060E5AC /* Quaternion.swift */,
+				166350831CE5861A0060E5AC /* Rocket.swift */,
 				1615C8941CDAED3D0094B1AC /* Sol.swift */,
 				1615C8841CD5864B0094B1AC /* Transfer.swift */,
 				162395401CD45180003304D9 /* Vector.swift */,
@@ -261,6 +267,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1615C8971CDAF0BC0094B1AC /* Bodies.swift in Sources */,
+				166350841CE5861A0060E5AC /* Rocket.swift in Sources */,
 				162395451CD4788C003304D9 /* Orbit.swift in Sources */,
 				1615C8991CDB0B4F0094B1AC /* CelestialProtocols.swift in Sources */,
 				1615C8931CDA58C20094B1AC /* CelestialExtensions.swift in Sources */,
@@ -269,6 +276,7 @@
 				1615C8831CD5549E0094B1AC /* OrbitalElements.swift in Sources */,
 				166E96671CDEB2400095C00C /* Kerbol.swift in Sources */,
 				162395411CD45180003304D9 /* Vector.swift in Sources */,
+				166350821CE0D4260060E5AC /* Quaternion.swift in Sources */,
 				1615C89B1CDB9DC90094B1AC /* TimeExtensions.swift in Sources */,
 				1615C8951CDAED3D0094B1AC /* Sol.swift in Sources */,
 			);

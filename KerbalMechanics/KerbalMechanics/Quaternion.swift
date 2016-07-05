@@ -27,6 +27,8 @@
 //  IN THE SOFTWARE.
 //
 
+import Darwin
+
 public struct Quaternion {
 
     public let w: Double

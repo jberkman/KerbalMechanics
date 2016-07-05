@@ -68,7 +68,7 @@ class OrbitTests: XCTestCase {
         let orbit = Orbit(elements: elements, atTime: 0).orbit(at: 225.degrees)
         XCTAssertEqualWithAccuracy(orbit.radius, 7_989_977, accuracy: 0.5)
         XCTAssertEqualWithAccuracy(orbit.azimuth.radians, -4.351, accuracy: 0.0005)
-        XCTAssertEqualWithAccuracy(orbit.velocity, 6_828, accuracy: 0.5)
+        XCTAssertEqualWithAccuracy(orbit.velocityMagnitude, 6_828, accuracy: 0.5)
     }
 
     /*

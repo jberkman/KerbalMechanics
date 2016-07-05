@@ -39,7 +39,7 @@ public struct Transfer {
     public let semiMajorAxis: Double
     public let trueAnomaly: Double
 
-    public let time: NSTimeInterval
+    public let time: Double
     public let celestialBody: CelestialBody
 
     // (5.3)
@@ -74,7 +74,7 @@ public struct Transfer {
         return Orbit(around: celestialBody, position: origin, velocity: departureVelocity)
     }
 
-    public init(around body: CelestialBody, fromOrigin origin: Vector, toDestination destination: Vector, duration: NSTimeInterval) {
+    public init(around body: CelestialBody, fromOrigin origin: Vector, toDestination destination: Vector, duration: Double) {
         self.origin = origin
         self.destination = destination
         celestialBody = body
@@ -113,7 +113,7 @@ public struct Transfer {
 
         // Using the trial value of p, solve for a from equation (5.12). The
         // type conic orbit will be known from the value of a.
-        typealias Pat = (p: Double, a: Double, t: NSTimeInterval)
+        typealias Pat = (p: Double, a: Double, t: Double)
         func eval(p: Double) -> Pat {
             // (5.12)
             let a = m * k * p / ((2 * m - pow(l, 2)) * pow(p, 2) + 2 * k * l * p - pow(k, 2))
@@ -124,7 +124,7 @@ public struct Transfer {
             // (5.6)
             let g = r1 * r2 * sin(trueAnomaly) / sqrt(µ * p)
 
-            let t: NSTimeInterval
+            let t: Double
             // Solve for E or F, as appropriate, using equations (5.13) and
             // (5.14) or equation (5.15)
             // Solve for t from equation (5.16) or (5.17)
